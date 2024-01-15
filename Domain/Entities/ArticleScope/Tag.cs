@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Domain.Entities.ArticleScope
 {
@@ -8,5 +9,11 @@ namespace Domain.Entities.ArticleScope
 
 		[MaxLength(16)]
 		public string Title { get; set; }
+
+		#region Relationships
+
+		public ICollection<Article> Articles { get; set; }
+
+		#endregion
 	}
 }

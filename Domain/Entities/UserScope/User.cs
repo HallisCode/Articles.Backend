@@ -5,13 +5,20 @@ namespace Domain.Entities.UserScope
 {
 	public class User
 	{
-		public int Id { get; set; }
-
-		public Security Security { get; set; }
+		public long Id { get; set; }
 
 		[Range(4, 16)]
 		public string Nickname { get; set; }
 
-		public DateTime DateRegistration { get; set; }
+		public DateTime RegistredAt { get; set; }
+
+		[MaxLength(256)]
+		public string? Bio { get; set; }
+
+		#region Relationships
+
+		public UserSecurity UserSecurity { get; set; }
+
+		#endregion
 	}
 }

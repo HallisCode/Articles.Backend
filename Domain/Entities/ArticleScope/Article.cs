@@ -3,21 +3,61 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
+
 namespace Domain.Entities.ArticleScope
 {
 	public class Article
 	{
-		int Id { get; set; }
+		public long Id { get; set; }
 
-		User Author { get; set; }
+		[Range(8, 128)]
+		public string Title { get; set; }
 
-		DateTime DateCreation { get; set; }
+		public DateTime CreatedAt { get; set; }
 
-		[MaxLength(64)]
-		string Title { get; set; }
+		public DateTime UpdatedAt { get; set; }
 
-		IEnumerable<Tag> Tags { get; set; }
+		public string Content { get; set; }
 
-		string Content { get; set; }
+
+		#region Relationships
+
+		public User Author { get; set; }
+
+		public long AuthorId { get; set; }
+
+		public ICollection<Tag> Tags { get; set; }
+
+		public ICollection<Review> Reviews { get; set; }
+
+		#endregion
+
+
+		#region Constructors
+
+		private Article(string title, DateTime createdAt, DateTime updatedAt, string content)
+		{
+			this.Title = title;
+
+			this.CreatedAt = createdAt;
+
+			this.UpdatedAt = updatedAt;
+
+			this.Content = content;
+		}
+
+		public Article(User author, string title, string content, ICollection<Tag> tags)
+		{
+			this.Author = author;
+
+			this.Title = title;
+
+			this.Content = content;
+
+			this.Tags = tags;
+		}
+
+		#endregion
+
 	}
 }
