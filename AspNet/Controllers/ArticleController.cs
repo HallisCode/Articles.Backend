@@ -1,21 +1,21 @@
 ﻿using Application.Services;
+using AspNet.Dto.Response;
 using AutoMapper;
 using Domain.Entities.ArticleScope;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using WebApi.Dto.ArticleScope;
 
 namespace WebApi.Controllers
 {
 
-	[ApiController]
+    [ApiController]
 	[Route("api/[controller]/[action]")]
 	public class ArticleController : ControllerBase
 	{
-		private ArticleService articleService;
+		private readonly ArticleService articleService;
 
-		private IMapper mapper;
+		private readonly IMapper mapper;
 
 
 		public ArticleController(ArticleService articleService, IMapper mapper)
@@ -28,19 +28,21 @@ namespace WebApi.Controllers
 		// Get
 
 		[HttpGet()]
-		public async Task<ActionResult<ArticleDto?>> GetById(int id)
+		public async Task<ActionResult<ArticleDto>> GetById(int id)
 		{
-			Article? article = await articleService.GetByAsync(id);
-
-			if (article is null) return NotFound();
+			Article article = await articleService.GetByAsync(id);
 
 			return mapper.Map<Article, ArticleDto>(article);
 		}
 
 		[HttpGet]
-		public async Task<ActionResult<IEnumerable<ArticleDto>?>> GetByTags(ICollection<string> tags)
+		public async Task<ActionResult<ICollection<ArticleDto>>> GetByTags([FromQuery] string[] tags)
 		{
-			return NotFound();
+			List<Article> articles = await articleService.GetByAsync(tags);
+
+			return mapper.Map<List<Article>, List<ArticleDto>>(articles);
 		}
+
+		// Create
 	}
 }
