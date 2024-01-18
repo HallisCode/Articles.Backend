@@ -1,15 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Domain.Entities.UserScope
+﻿namespace Domain.Entities.UserScope
 {
 	public class UserSecurity
 	{
 		public long Id { get; set; }
 
-		[MaxLength(256)]
 		public string Email { get; set; }
 
-		[Range(8, 128)]
 		public string Password { get; set; }
 
 
@@ -18,6 +14,27 @@ namespace Domain.Entities.UserScope
 		public User User { get; set; }
 
 		public long UserId { get; set; }
+
+		#endregion
+
+
+		#region Constructors
+
+		private UserSecurity(string email, string password)
+		{
+			this.Email = email;
+
+			this.Password = password;
+		}
+
+		public UserSecurity(string email, string password, long userId)
+		{
+			this.Email = email;
+
+			this.Password = password;
+
+			this.UserId = userId;
+		}
 
 		#endregion
 	}

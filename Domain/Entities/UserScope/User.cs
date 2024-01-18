@@ -1,5 +1,6 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using Domain.Entities.ArticleScope;
+using System;
+using System.Collections.Generic;
 
 namespace Domain.Entities.UserScope
 {
@@ -7,17 +8,40 @@ namespace Domain.Entities.UserScope
 	{
 		public long Id { get; set; }
 
-		[Range(4, 16)]
 		public string Nickname { get; set; }
 
 		public DateTime RegistredAt { get; set; }
 
-		[MaxLength(256)]
-		public string? Bio { get; set; }
+		public string Bio { get; set; }
 
 		#region Relationships
 
 		public UserSecurity UserSecurity { get; set; }
+
+		public ICollection<UserSession> UserSessions { get; set; }
+
+		public ICollection<Article> Articles { get; set; }
+
+		#endregion
+
+
+		#region Constructors
+
+		private User(string nickname, DateTime registredAt, string bio)
+		{
+			this.Nickname = nickname;
+
+			this.RegistredAt = registredAt;
+
+			this.Bio = bio;
+		}
+
+		public User(string nickname, string? bio = null)
+		{
+			this.Nickname = nickname;
+
+			this.Bio = bio;
+		}
 
 		#endregion
 	}

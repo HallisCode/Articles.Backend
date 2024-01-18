@@ -1,7 +1,6 @@
 ﻿using Domain.Entities.UserScope;
 using Domain.Enum;
 using System.Collections.Generic;
-using System.ComponentModel;
 
 namespace Domain.Entities.ArticleScope
 {
@@ -11,7 +10,6 @@ namespace Domain.Entities.ArticleScope
 
 		public string Content { get; set; }
 
-		[DefaultValue(ReviewType.netrual)]
 		public ReviewType Type { get; set; }
 
 

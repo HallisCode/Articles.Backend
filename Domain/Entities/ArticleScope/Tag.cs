@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace Domain.Entities.ArticleScope
 {
@@ -7,7 +6,6 @@ namespace Domain.Entities.ArticleScope
 	{
 		public int Id { get; set; }
 
-		[MaxLength(16)]
 		public string Title { get; set; }
 
 		#region Relationships
@@ -15,5 +13,10 @@ namespace Domain.Entities.ArticleScope
 		public ICollection<Article> Articles { get; set; }
 
 		#endregion
+
+		public Tag(string title)
+		{
+			this.Title = title;
+		}
 	}
 }

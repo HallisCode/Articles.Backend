@@ -1,7 +1,6 @@
 ﻿using Domain.Entities.UserScope;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 
 namespace Domain.Entities.ArticleScope
@@ -10,7 +9,6 @@ namespace Domain.Entities.ArticleScope
 	{
 		public long Id { get; set; }
 
-		[Range(8, 128)]
 		public string Title { get; set; }
 
 		public DateTime CreatedAt { get; set; }
