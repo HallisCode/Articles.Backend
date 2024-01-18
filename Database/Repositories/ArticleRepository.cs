@@ -10,7 +10,7 @@ namespace Database.Repositories
 {
 	public class ArticleRepository
 	{
-		private ApplicationDbContext context;
+		private readonly ApplicationDbContext context;
 
 		public ArticleRepository(ApplicationDbContext context)
 		{
@@ -24,9 +24,12 @@ namespace Database.Repositories
 			return await context.Articles.AsNoTracking().SingleOrDefaultAsync(article => article.Id == id);
 		}
 
-		public async Task<List<Article>?> GetByAsync(ICollection<Tag> tags)
+		public async Task<List<Article>?> GetByAsync(ICollection<string> tags)
 		{
-			return await context.Articles.AsNoTracking().Where(article => tags.All(tag => article.Tags.Contains(tag))).ToListAsync();
+			return await context.Articles.AsNoTracking()
+				.Where(article => article.Tags
+				.Where(tag => tags.Any(tagName => tag.Title == tagName)).Count() == tags.Count)
+				.ToListAsync();
 		}
 
 		// Create
@@ -56,7 +59,7 @@ namespace Database.Repositories
 
 			if (tags is not null) article.Tags = tags;
 
-			article.UpdatedAt = DateTime.Now;
+			article.UpdatedAt = DateTime.UtcNow;
 
 			await context.SaveChangesAsync();
 
