@@ -1,4 +1,5 @@
 using Application.Services;
+using AspNet.Middlewares;
 using Database;
 using Database.Repositories;
 using Microsoft.AspNetCore.Builder;
@@ -30,8 +31,12 @@ namespace WebApi
 			builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 			builder.Services.AddScoped<ArticleRepository>();
-			builder.Services.AddScoped<ArticleService>();
+			builder.Services.AddScoped<UserRepository>();
+			builder.Services.AddScoped<UserSecurityRepository>();
+			builder.Services.AddScoped<UserSessionRepository>();
 
+			builder.Services.AddScoped<ArticleService>();
+			builder.Services.AddScoped<AuthenticationService>();
 
 
 			WebApplication app = builder.Build();
@@ -47,6 +52,10 @@ namespace WebApi
 
 
 			// Добавление middleware
+
+			app.UseExceptionMiddleware();
+
+			app.UseSessionMiddlewar();
 
 			app.UseHttpsRedirection();
 

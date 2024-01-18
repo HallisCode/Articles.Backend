@@ -1,12 +1,11 @@
-﻿using AutoMapper;
+﻿using AspNet.Dto.Response;
+using AutoMapper;
 using Domain.Entities.ArticleScope;
 using Domain.Entities.UserScope;
-using WebApi.Dto.ArticleScope;
-using WebApi.Dto.UserScope;
 
 namespace WebApi.Mapping
 {
-	public class MapperProfile : Profile
+    public class MapperProfile : Profile
 	{
 		public MapperProfile()
 		{
