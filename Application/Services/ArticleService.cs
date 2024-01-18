@@ -1,14 +1,15 @@
 ﻿using Database.Repositories;
 using Domain.Entities.ArticleScope;
 using Domain.Entities.UserScope;
+using Domain.Exceptions.CRUD;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Application.Services
 {
-	public class ArticleService
+    public class ArticleService
 	{
-		private ArticleRepository articleRepository;
+		private readonly ArticleRepository articleRepository;
 
 		public ArticleService(ArticleRepository articleRepository)
 		{
@@ -17,14 +18,33 @@ namespace Application.Services
 
 		// Get
 
-		public async Task<Article?> GetByAsync(long id)
+		/// <summary>
+		/// Получаем статью на основе id
+		/// </summary>
+		/// <returns></returns>
+		/// <exception cref="NotFoundException"></exception>
+		public async Task<Article> GetByAsync(long id)
 		{
-			return await articleRepository.GetByAsync(id);
+
+			Article? article = await articleRepository.GetByAsync(id);
+
+			if (article is null) throw new NotFoundException("Article is not found");
+
+			return article;
 		}
 
-		public async Task<List<Article>?> GetByAsync(ICollection<Tag> tags)
+		/// <summary>
+		/// Получаем статьи на основе совпадающих тегов
+		/// </summary>
+		/// <returns></returns>
+		/// <exception cref="NotFoundException"></exception>
+		public async Task<List<Article>> GetByAsync(ICollection<string> tags)
 		{
-			return await articleRepository.GetByAsync(tags);
+			List<Article>? articles = await articleRepository.GetByAsync(tags);
+
+			if (articles is null) throw new NotFoundException("Articles is not found");
+
+			return articles;
 		}
 
 		// Create
