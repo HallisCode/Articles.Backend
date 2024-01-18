@@ -13,6 +13,11 @@ namespace Database.EntityConfigurations.UserScope
 				.HasForeignKey<UserSecurity>(userSecurity => userSecurity.UserId)
 				.OnDelete(DeleteBehavior.Cascade);
 
+			builder.HasIndex(userSecurity => userSecurity.Email).IsUnique(true);
+
+			builder.Property(userSecurity => userSecurity.Email).HasMaxLength(256);
+
+			builder.Property(userSecurity => userSecurity.Password).HasMaxLength(64);
 		}
 	}
 }

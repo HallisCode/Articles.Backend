@@ -12,6 +12,8 @@ namespace Database.EntityConfigurations.ArticleScope
 				.WithMany(article => article.Tags);
 
 			builder.HasIndex(tag => tag.Title).IsUnique(true);
+
+			builder.Property(tag => tag.Title).HasMaxLength(32);
 		}
 	}
 }

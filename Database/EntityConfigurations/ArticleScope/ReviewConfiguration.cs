@@ -1,4 +1,5 @@
 ﻿using Domain.Entities.ArticleScope;
+using Domain.Enum;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -14,6 +15,8 @@ namespace Database.EntityConfigurations.ArticleScope
 				.OnDelete(DeleteBehavior.Cascade);
 
 			builder.HasAlternateKey(review => new { review.ArticleId, review.UserId });
+
+			builder.Property(review => review.Type).HasDefaultValue(ReviewType.netrual);
 		}
 	}
 }
