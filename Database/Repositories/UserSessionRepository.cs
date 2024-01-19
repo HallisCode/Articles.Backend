@@ -35,26 +35,6 @@ namespace Database.Repositories
 
 		#region NotNullableMehdos
 
-		#endregion
-
-		public async Task<UserSession> GetByAsync(string sessionKey)
-		{
-			UserSession? userSession = await TryGetByAsync(sessionKey);
-
-			if (userSession is null) throw new NotFoundException("Session with such a sessionKey isn't exist");
-
-			return userSession;
-		}
-
-		public async Task<UserSession> GetByAsync(long userId)
-		{
-			UserSession? userSession = await TryGetByAsync(userId);
-
-			if (userSession is null) throw new NotFoundException("Session with such an userId isn't exist");
-
-			return userSession;
-		}
-
 		public async Task<UserSession> CreateAsync(string sessionKey, long userId, DateTime expiredAt)
 		{
 			UserSession userSession = new UserSession(sessionKey, userId, expiredAt);
@@ -80,4 +60,6 @@ namespace Database.Repositories
 			await context.SaveChangesAsync();
 		}
 	}
+
+	#endregion
 }

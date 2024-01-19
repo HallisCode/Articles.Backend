@@ -23,26 +23,17 @@ namespace Database.Repositories
 			return user;
 		}
 
-		#endregion
 
-		#region NotNullableMehdos
-
-		public async Task<User> GetByAsync(long userId)
-		{
-			User? user = await TryGetByAsync(userId);
-
-			if (user is null) throw new NotFoundException("User is not found");
-
-			return user;
-		}
-
-		public async Task<User?> GetByAsync(string nickname)
+		public async Task<User?> TryGetByAsync(string nickname)
 		{
 			User? user = await context.Users.FirstOrDefaultAsync(user => user.Nickname == nickname);
 
 			return user;
 		}
 
+		#endregion
+
+		#region NotNullableMehdos
 
 		public async Task<User> CreateAsync(string nickname, string? bio = null)
 		{

@@ -17,14 +17,14 @@ namespace Database.Repositories
 			this.context = context;
 		}
 
-		// Get
+		#region NullableMethods
 
-		public async Task<Article?> GetByAsync(long id)
+		public async Task<Article?> TryGetByAsync(long id)
 		{
 			return await context.Articles.AsNoTracking().SingleOrDefaultAsync(article => article.Id == id);
 		}
 
-		public async Task<List<Article>?> GetByAsync(ICollection<string> tags)
+		public async Task<List<Article>?> TryGetByAsync(ICollection<string> tags)
 		{
 			return await context.Articles.AsNoTracking()
 				.Where(article => article.Tags
@@ -32,7 +32,9 @@ namespace Database.Repositories
 				.ToListAsync();
 		}
 
-		// Create
+		#endregion
+
+		#region NotNullableMethods
 
 		public async Task<Article> CreateAsync(string title, string content, User user, ICollection<Tag> tags)
 		{
@@ -47,7 +49,6 @@ namespace Database.Repositories
 			return article;
 		}
 
-		// Update
 
 		public async Task<Article> UpdateAsync(Article article, string? title = null, string? content = null, ICollection<Tag>? tags = null)
 		{
@@ -66,7 +67,6 @@ namespace Database.Repositories
 			return article;
 		}
 
-		// Delete
 
 		public async Task DeleteAsync(Article article)
 		{
@@ -74,5 +74,7 @@ namespace Database.Repositories
 
 			await context.SaveChangesAsync();
 		}
+
+		#endregion
 	}
 }
