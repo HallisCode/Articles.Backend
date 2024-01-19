@@ -53,6 +53,8 @@ namespace Domain.Entities.ArticleScope
 			this.Content = content;
 
 			this.Tags = tags;
+
+			this.CreatedAt = DateTime.UtcNow;
 		}
 
 		#endregion

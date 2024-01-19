@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using FluentValidation;
 
 namespace WebApi
 {
@@ -29,6 +30,7 @@ namespace WebApi
 			builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectPostresql), ServiceLifetime.Scoped);
 
 			builder.Services.AddAutoMapper(typeof(Program).Assembly);
+			builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 			builder.Services.AddScoped<ArticleRepository>();
 			builder.Services.AddScoped<UserRepository>();

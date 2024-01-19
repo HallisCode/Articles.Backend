@@ -41,6 +41,8 @@ namespace Domain.Entities.UserScope
 			this.Nickname = nickname;
 
 			this.Bio = bio;
+
+			this.RegistredAt = DateTime.UtcNow;
 		}
 
 		#endregion

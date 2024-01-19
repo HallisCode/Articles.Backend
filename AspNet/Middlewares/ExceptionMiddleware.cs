@@ -2,7 +2,6 @@
 using Domain.Exceptions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using System;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -32,16 +31,16 @@ namespace AspNet.Middlewares
 				await httpContext.Response.WriteAsync(JsonSerializer.Serialize(errorDetails));
 			}
 
-			catch(Exception exception)
-			{
-				httpContext.Response.StatusCode = 500;
+			//catch (Exception exception)
+			//{
+			//	httpContext.Response.StatusCode = 500;
 
-				ErrorDetails errorDetails = new ErrorDetails(
-					nameof(IntentionalInternalException),
-					"Ooops...something is wrong. Please, notify administrator of this website");
+			//	ErrorDetails errorDetails = new ErrorDetails(
+			//		nameof(IntentionalInternalException),
+			//		"Ooops...something is wrong. Please, notify administrator of this website");
 
-				await httpContext.Response.WriteAsync(JsonSerializer.Serialize(errorDetails));
-			}
+			//	await httpContext.Response.WriteAsync(JsonSerializer.Serialize(errorDetails));
+			//}
 		}
 	}
 
