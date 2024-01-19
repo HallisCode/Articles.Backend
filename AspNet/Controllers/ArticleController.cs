@@ -25,8 +25,6 @@ namespace WebApi.Controllers
 			this.mapper = mapper;
 		}
 
-		// Get
-
 		[HttpGet()]
 		public async Task<ActionResult<ArticleDto>> GetById(int id)
 		{
@@ -43,6 +41,5 @@ namespace WebApi.Controllers
 			return mapper.Map<List<Article>, List<ArticleDto>>(articles);
 		}
 
-		// Create
 	}
 }
