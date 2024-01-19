@@ -30,12 +30,13 @@ namespace Application.Services
 		}
 
 		/// <summary>Регистрирует пользователя на основе входных данных. 
-		/// Создаются такие сущности как User, UserSecurity, UserSession.</summary>
+		/// Создаются такие сущности как User, UserSecurity.</summary>
 		public async Task<User> RegistryAsync(string email, string password, string nickname, string? bio = null)
 		{
+
 			using (SHA256 sha256 = SHA256.Create())
 			{
-				email = SHA256Utils.Encrypt(email, sha256);
+				email = SHA256Utils.Encrypt(email.ToLower(), sha256);
 
 				password = SHA256Utils.Encrypt(password, sha256);
 			}
@@ -47,7 +48,7 @@ namespace Application.Services
 
 			if (userSecurity is null)
 			{
-				user = await userRepository.GetByAsync(nickname);
+				user = await userRepository.TryGetByAsync(nickname);
 
 				if (user is not null) throw new AlreadyExistException("This nickname is already claimed");
 
@@ -73,7 +74,7 @@ namespace Application.Services
 		{
 			using (SHA256 sha256 = SHA256.Create())
 			{
-				email = SHA256Utils.Encrypt(email, sha256);
+				email = SHA256Utils.Encrypt(email.ToLower(), sha256);
 
 				password = SHA256Utils.Encrypt(password, sha256);
 			}
@@ -84,11 +85,9 @@ namespace Application.Services
 			if (userSecurity is null) throw new CredentialDontMatch("Email or password is wrong");
 
 
-			bool isEmailMatched = userSecurity.Email == email;
-
 			bool isPasswordMatched = userSecurity.Password == password;
 
-			if (isEmailMatched && isPasswordMatched)
+			if (isPasswordMatched)
 			{
 				UserSession? userSession = await userSessionRepository.TryGetByAsync(userSecurity.UserId);
 
@@ -100,7 +99,6 @@ namespace Application.Services
 
 				return sessionKey;
 			}
-
 
 			throw new CredentialDontMatch("Email or password is wrong");
 		}
@@ -116,18 +114,20 @@ namespace Application.Services
 		}
 
 		/// <summary>
-		/// Возвращает пользователя на основе sessionKey
+		/// Проверяет sessionKey и на его основе возвращает пользователя
 		/// </summary>
 		/// <returns>User</returns>
-		public async Task<User> GetUserBySessionKey(string sessionKey)
+		public async Task<User> CheckSessionkey(string sessionKey)
 		{
-			UserSession userSession = await userSessionRepository.GetByAsync(sessionKey);
+			UserSession? userSession = await userSessionRepository.TryGetByAsync(sessionKey);
+
+			if (userSession is null) throw new SessionException("SessionKey isn't found");
 
 			if (DateTime.UtcNow > userSession.ExpiredAt) throw new SessionException("SessionKey is already expired");
 
-			return await userRepository.GetByAsync(userSession.UserId);
-		}
+			return (await userRepository.TryGetByAsync(userSession.UserId))!;
 
+		}
 
 	}
 }

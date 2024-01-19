@@ -26,7 +26,7 @@ namespace Application.Services
 		public async Task<Article> GetByAsync(long id)
 		{
 
-			Article? article = await articleRepository.GetByAsync(id);
+			Article? article = await articleRepository.TryGetByAsync(id);
 
 			if (article is null) throw new NotFoundException("Article is not found");
 
@@ -40,7 +40,7 @@ namespace Application.Services
 		/// <exception cref="NotFoundException"></exception>
 		public async Task<List<Article>> GetByAsync(ICollection<string> tags)
 		{
-			List<Article>? articles = await articleRepository.GetByAsync(tags);
+			List<Article>? articles = await articleRepository.TryGetByAsync(tags);
 
 			if (articles is null) throw new NotFoundException("Articles is not found");
 
