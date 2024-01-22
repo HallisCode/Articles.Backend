@@ -19,7 +19,7 @@ namespace Database.Repositories
 
 		public async Task<UserSession?> TryGetByAsync(string sessionKey)
 		{
-			UserSession? userSession = await context.UserSessions.FirstOrDefaultAsync(userSession => userSession.SessionKey == sessionKey);
+			UserSession? userSession = await context.UserSessions.FirstOrDefaultAsync(userSession => userSession.SessionId == sessionKey);
 
 			return userSession;
 		}
@@ -55,7 +55,7 @@ namespace Database.Repositories
 
 		public async Task DeleteAsync(string sessionKey)
 		{
-			await context.UserSessions.Where(userSessions => userSessions.SessionKey == sessionKey).ExecuteDeleteAsync();
+			await context.UserSessions.Where(userSessions => userSessions.SessionId == sessionKey).ExecuteDeleteAsync();
 
 			await context.SaveChangesAsync();
 		}

@@ -13,9 +13,9 @@ namespace Database.EntityConfigurations.UserScope
 				.HasForeignKey(userSession => userSession.UserId)
 				.OnDelete(DeleteBehavior.Cascade);
 
-			builder.HasIndex(userSession => userSession.SessionKey).IsUnique(true);
+			builder.HasIndex(userSession => userSession.SessionId).IsUnique(true);
 
-			builder.Property(userSession => userSession.SessionKey).HasMaxLength(128);
+			builder.Property(userSession => userSession.SessionId).HasMaxLength(128);
 
 		}
 	}

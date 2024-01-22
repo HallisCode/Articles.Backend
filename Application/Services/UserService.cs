@@ -14,6 +14,11 @@ namespace Application.Services
 			this.userRepository = userRepository;
 		}
 
+		/// <summary>
+		/// Получаем пользователя на основе id
+		/// </summary>
+		/// <returns></returns>
+		/// <exception cref="NotFoundException"></exception>
 		public async Task<User> GetByAsync(long id)
 		{
 			User? user = await userRepository.TryGetByAsync(id);
@@ -24,6 +29,11 @@ namespace Application.Services
 
 		}
 
+		/// <summary>
+		/// Получаем пользователя на основе nickname
+		/// </summary>
+		/// <returns></returns>
+		/// <exception cref="NotFoundException"></exception>
 		public async Task<User> GetByAsync(string nikcname)
 		{
 			User? user = await userRepository.TryGetByAsync(nikcname);

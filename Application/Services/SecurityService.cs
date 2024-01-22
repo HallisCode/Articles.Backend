@@ -25,6 +25,11 @@ namespace Application.Services
 			this.userSessionRepository = userSessionRepository;
 		}
 
+		/// <summary>
+		/// Меняем пароль установленному пользователю
+		/// </summary>
+		/// <returns></returns>
+		/// <exception cref="CredentialDontMatch"></exception>
 		public async Task ChangePasswordAsync(long userId, string oldPassword, string newPassword)
 		{
 			using (SHA256 sha256 = SHA256.Create())

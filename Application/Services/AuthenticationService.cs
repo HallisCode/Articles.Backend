@@ -18,7 +18,7 @@ namespace Application.Services
 
 		private readonly UserSessionRepository userSessionRepository;
 
-		private readonly TimeSpan lifeSpanSession = new TimeSpan(14, 0, 0, 0);
+		private readonly TimeSpan lifeSpanSession = new TimeSpan(21, 0, 0, 0);
 
 		public AuthenticationService(
 			UserSecurityRepository userSecurityRepository,
@@ -38,14 +38,12 @@ namespace Application.Services
 		/// </summary>
 		public async Task<User> RegistryAsync(string email, string password, string nickname)
 		{
-
 			using (SHA256 sha256 = SHA256.Create())
 			{
 				email = SHA256Utils.Encrypt(email, sha256);
 
 				password = SHA256Utils.Encrypt(password, sha256);
 			}
-
 
 			User? user;
 
@@ -96,7 +94,8 @@ namespace Application.Services
 			{
 				UserSession? userSession = await userSessionRepository.TryGetByAsync(userSecurity.UserId);
 
-				if (userSession is not null && DateTime.UtcNow < userSession.ExpiredAt) return userSession.SessionKey;
+				if (userSession is not null && DateTime.UtcNow < userSession.ExpiredAt) return userSession.SessionId;
+
 
 				string sessionKey = SessionMaker.CreateSessionKey();
 
@@ -112,10 +111,14 @@ namespace Application.Services
 		/// Производит удаление сессии на основе sessionId
 		/// </summary>
 		/// <returns></returns>
-		public async Task LogOutAsync(string sessionKey)
+		/// <exception cref="SessionException"></exception>
+		public async Task LogOutAsync(string sessionId)
 		{
-			await userSessionRepository.DeleteAsync(sessionKey);
+			UserSession? userSession = await userSessionRepository.TryGetByAsync(sessionId);
 
+			if (userSession is null) throw new SessionException("Session isn't found");
+
+			await userSessionRepository.DeleteAsync(sessionId);
 		}
 
 		/// <summary>

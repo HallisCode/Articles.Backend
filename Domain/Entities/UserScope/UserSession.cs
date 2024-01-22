@@ -6,7 +6,7 @@ namespace Domain.Entities.UserScope
 	{
 		public long Id { get; set; }
 
-		public string SessionKey { get; set; }
+		public string SessionId { get; set; }
 
 		public DateTime ExpiredAt { get; set; }
 
@@ -20,17 +20,17 @@ namespace Domain.Entities.UserScope
 
 		#region Constructors
 
-		private UserSession(string sessionKey, DateTime expiredAt)
+		private UserSession(string sessionId, DateTime expiredAt)
 		{
-			this.SessionKey = sessionKey;
+			this.SessionId = sessionId;
 
 			this.ExpiredAt = expiredAt;
 
 		}
 
-		public UserSession(string sessionKey, long userId, DateTime expiredAt)
+		public UserSession(string sessionId, long userId, DateTime expiredAt)
 		{
-			this.SessionKey = sessionKey;
+			this.SessionId = sessionId;
 
 			this.ExpiredAt = expiredAt;
 

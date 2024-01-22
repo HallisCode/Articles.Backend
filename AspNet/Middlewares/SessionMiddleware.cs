@@ -18,13 +18,13 @@ namespace AspNet.Middlewares
 		public async Task InvokeAsync(HttpContext httpContext, AuthenticationService authenticationService)
 		{
 
-			StringValues possibleSessionKey;
+			StringValues possibleSessionId;
 
-			bool isHasSessionKey = httpContext.Request.Headers.TryGetValue("sessionKey", out possibleSessionKey);
+			bool isHasSessionId = httpContext.Request.Headers.TryGetValue("sessionKey", out possibleSessionId);
 
-			if (isHasSessionKey)
+			if (isHasSessionId)
 			{
-				string sessionKey = possibleSessionKey[0]!;
+				string sessionKey = possibleSessionId[0]!;
 
 				httpContext.Items["User"] = await authenticationService.CheckSessionId(sessionKey);
 			}
