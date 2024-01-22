@@ -1,4 +1,5 @@
 ﻿using Application.Services;
+using AspNet.Attrubites;
 using AspNet.Dto.Request;
 using AspNet.Dto.Response;
 using AspNet.Validation.Extensions;
@@ -11,13 +12,14 @@ using System.Threading.Tasks;
 
 namespace AspNet.Controllers
 {
+	[Authorize]
 	[ApiController]
 	[Route("api/[controller]/[action]")]
 	public class AuthenticationController : ControllerBase
 	{
 		private readonly AuthenticationService authenticationService;
 
-		private readonly IValidator<RegistryDto> registryDtoValidator;
+		private readonly IValidator<RegistryRequest> registryValidator;
 
 		private IMapper mapper;
 
@@ -25,21 +27,22 @@ namespace AspNet.Controllers
 		public AuthenticationController(
 			AuthenticationService authenticationService,
 			IMapper mapper,
-			IValidator<RegistryDto> registryDtoValidator
+			IValidator<RegistryRequest> registryValidator
 			)
 		{
 			this.authenticationService = authenticationService;
 
 			this.mapper = mapper;
 
-			this.registryDtoValidator = registryDtoValidator;
+			this.registryValidator = registryValidator;
 
 		}
 
+		[AllowAnonymous]
 		[HttpPost]
-		public async Task<ActionResult<UserDto>> Registry(RegistryDto registryDto)
+		public async Task<ActionResult<UserResponse>> Registry(RegistryRequest registryRequest)
 		{
-			ValidationResult validationResult = await registryDtoValidator.ValidateAsync(registryDto);
+			ValidationResult validationResult = await registryValidator.ValidateAsync(registryRequest);
 
 			if (!validationResult.IsValid)
 			{
@@ -49,29 +52,30 @@ namespace AspNet.Controllers
 			}
 
 			User user = await authenticationService.RegistryAsync(
-				registryDto.Email,
-				registryDto.Password,
-				registryDto.Nickname,
-				registryDto.Bio
+				registryRequest.Email,
+				registryRequest.Password,
+				registryRequest.Nickname,
+				registryRequest.Bio
 				);
 
-			return mapper.Map<User, UserDto>(user);
+			return mapper.Map<User, UserResponse>(user);
 
 		}
 
+		[AllowAnonymous]
 		[HttpPost]
-		public async Task<ActionResult<string>> LogIn(LogInDto logInDto)
+		public async Task<ActionResult<string>> LogIn(LogInRequest logInModel)
 		{
 			return await authenticationService.LogInAsync(
-				logInDto.Email,
-				logInDto.Password
+				logInModel.Email,
+				logInModel.Password
 				);
 		}
 
-		[HttpPost]
-		public async Task<ActionResult> LogOut([FromBody]string sessionKey)
+		[HttpDelete]
+		public async Task<ActionResult> LogOut()
 		{
-			await authenticationService.LogOutAsync(sessionKey);
+			await authenticationService.LogOutAsync(HttpContext.Request.Headers["sessionKey"]!);
 
 			return Ok();
 		}
