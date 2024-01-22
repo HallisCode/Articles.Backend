@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace AspNet.Validation.ModelConfiguration
 {
-	public class LogInValidator : AbstractValidator<LogInDto>
+	public class LogInValidator : AbstractValidator<LogInRequest>
 	{
 	}
 }

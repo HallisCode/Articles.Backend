@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using FluentValidation;
+using Application.IServices;
+using Domain.Entities.UserScope;
 
 namespace WebApi
 {
@@ -33,12 +35,13 @@ namespace WebApi
 			builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 			builder.Services.AddScoped<ArticleRepository>();
+			builder.Services.AddScoped<TagRepository>();
 			builder.Services.AddScoped<UserRepository>();
 			builder.Services.AddScoped<UserSecurityRepository>();
 			builder.Services.AddScoped<UserSessionRepository>();
 
 			builder.Services.AddScoped<ArticleService>();
-			builder.Services.AddScoped<AuthenticationService>();
+			builder.Services.AddScoped<IAuthenticationService<User>, AuthenticationService>();
 
 
 			WebApplication app = builder.Build();

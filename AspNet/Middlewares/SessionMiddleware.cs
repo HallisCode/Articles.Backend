@@ -26,7 +26,7 @@ namespace AspNet.Middlewares
 			{
 				string sessionKey = possibleSessionKey[0]!;
 
-				httpContext.Items["User"] = await authenticationService.CheckSessionkey(sessionKey);
+				httpContext.Items["User"] = await authenticationService.CheckSessionId(sessionKey);
 			}
 
 			await next.Invoke(httpContext);
