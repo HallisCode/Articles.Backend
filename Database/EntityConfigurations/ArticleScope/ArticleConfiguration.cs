@@ -17,9 +17,7 @@ namespace Database.EntityConfigurations.ArticleScope
 
 			builder.HasIndex(article => article.Title).IsUnique(true);
 
-			builder.Property(article => article.Title).HasMaxLength(128);
-
-			builder.Property(article => article.CreatedAt).HasDefaultValue(DateTime.UtcNow);
+			builder.Property(article => article.Title).HasMaxLength(512);
 		}
 	}
 }

@@ -15,6 +15,7 @@ namespace Database.Repositories
 		{
 			this.context = context;
 		}
+
 		#region NullableMethods
 
 		public async Task<UserSession?> TryGetByAsync(string sessionKey)

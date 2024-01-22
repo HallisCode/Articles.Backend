@@ -21,14 +21,21 @@ namespace Database.Repositories
 
 		public async Task<Article?> TryGetByAsync(long id)
 		{
-			return await context.Articles.AsNoTracking().SingleOrDefaultAsync(article => article.Id == id);
+			return await context.Articles.AsNoTracking().Include(article => article.Tags).Include(article => article.Author)
+				.SingleOrDefaultAsync(article => article.Id == id);
 		}
 
-		public async Task<List<Article>?> TryGetByAsync(ICollection<string> tags)
+		public async Task<Article?> TryGetByAsync(string title)
 		{
-			return await context.Articles.AsNoTracking()
+			return await context.Articles.AsNoTracking().Include(article => article.Tags).Include(article => article.Author)
+				.FirstOrDefaultAsync(article => EF.Functions.Like(article.Title, $"%{title}%"));
+		}
+
+		public async Task<List<Article>?> TryGetByAsync(ICollection<Tag> tags)
+		{
+			return await context.Articles.AsNoTracking().Include(article => article.Tags).Include(article => article.Author)
 				.Where(article => article.Tags
-				.Where(tag => tags.Any(tagName => tag.Title == tagName)).Count() == tags.Count)
+				.Where(tag => tags.Contains(tag)).Count() == tags.Count())
 				.ToListAsync();
 		}
 
@@ -36,9 +43,11 @@ namespace Database.Repositories
 
 		#region NotNullableMethods
 
-		public async Task<Article> CreateAsync(string title, string content, User user, ICollection<Tag> tags)
+		public async Task<Article> CreateAsync(string title, string content, long userId, ICollection<Tag> tags)
 		{
-			Article article = new Article(user, title, content, tags);
+			Article article = new Article(userId, title, content, tags);
+
+			article.CreatedAt = DateTime.UtcNow;
 
 			article.Tags = tags;
 
@@ -68,9 +77,9 @@ namespace Database.Repositories
 		}
 
 
-		public async Task DeleteAsync(Article article)
+		public async Task DeleteAsync(long id)
 		{
-			context.Remove(article);
+			await context.Articles.Where(article => article.Id == id).ExecuteDeleteAsync();
 
 			await context.SaveChangesAsync();
 		}

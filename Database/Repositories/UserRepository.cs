@@ -1,6 +1,7 @@
 ﻿using Domain.Entities.UserScope;
 using Domain.Exceptions.CRUD;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Threading.Tasks;
 
 namespace Database.Repositories
@@ -16,9 +17,9 @@ namespace Database.Repositories
 
 		#region NullableMethods
 
-		public async Task<User?> TryGetByAsync(long userId)
+		public async Task<User?> TryGetByAsync(long id)
 		{
-			User? user = await context.Users.FirstOrDefaultAsync(user => user.Id == userId);
+			User? user = await context.Users.FirstOrDefaultAsync(user => user.Id == id);
 
 			return user;
 		}
@@ -38,6 +39,8 @@ namespace Database.Repositories
 		public async Task<User> CreateAsync(string nickname, string? bio = null)
 		{
 			User user = new User(nickname, bio);
+
+			user.RegistredAt = DateTime.UtcNow;
 
 			context.Add(user);
 

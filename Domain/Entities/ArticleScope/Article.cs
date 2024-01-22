@@ -44,9 +44,9 @@ namespace Domain.Entities.ArticleScope
 			this.Content = content;
 		}
 
-		public Article(User author, string title, string content, ICollection<Tag> tags)
+		public Article(long authorId, string title, string content, ICollection<Tag> tags)
 		{
-			this.Author = author;
+			this.AuthorId = authorId;
 
 			this.Title = title;
 

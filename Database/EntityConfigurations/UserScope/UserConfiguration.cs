@@ -15,7 +15,6 @@ namespace Database.EntityConfigurations.UserScope
 
 			builder.Property(user => user.Bio).HasMaxLength(256).IsRequired(false);
 
-			builder.Property(user => user.RegistredAt).HasDefaultValue(DateTime.UtcNow);
 		}
 	}
 }
