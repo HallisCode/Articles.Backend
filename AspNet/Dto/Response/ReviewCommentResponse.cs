@@ -1,6 +1,6 @@
 ﻿namespace AspNet.Dto.Response
 {
-    public class ReviewCommentDto
+    public class ReviewCommentResponse
     {
         public long Id { get; set; }
 

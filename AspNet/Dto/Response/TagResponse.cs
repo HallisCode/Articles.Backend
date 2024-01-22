@@ -1,6 +1,6 @@
 ﻿namespace AspNet.Dto.Response
 {
-    public class TagDto
+    public class TagResponse
     {
         public int Id { get; set; }
 

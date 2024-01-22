@@ -2,7 +2,7 @@
 
 namespace AspNet.Dto.Response
 {
-    public class UserDto
+    public class UserResponse
     {
         public long Id { get; set; }
 
