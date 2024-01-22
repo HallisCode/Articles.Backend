@@ -2,12 +2,11 @@
 {
     public class AlreadyExistException : IntentionalInternalException
     {
-        public AlreadyExistException(string message) : base(message)
-        {
+		public AlreadyExistException(string title, string? details = null) : base(title, details)
+		{
+		}
 
-        }
-
-        protected override void Initialize()
+		protected override void Initialize()
         {
             StatusCode = 409;
         }

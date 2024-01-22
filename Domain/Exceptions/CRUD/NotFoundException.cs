@@ -2,11 +2,11 @@
 {
     public class NotFoundException : IntentionalInternalException
     {
-        public NotFoundException(string message) : base(message)
-        {
-        }
+		public NotFoundException(string title, string? details = null) : base(title, details)
+		{
+		}
 
-        protected override void Initialize()
+		protected override void Initialize()
         {
             StatusCode = 404;
         }

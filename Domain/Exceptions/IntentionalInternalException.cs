@@ -6,12 +6,16 @@ namespace Domain.Exceptions
 	{
 		public int StatusCode { get; protected set; } = 500;
 
-		public string Message { get; protected set; }
+		public string Title { get; protected set; }
 
-		public IntentionalInternalException(string message)
-			: base(message)
+		public string? Details { get; protected set; }
+
+		public IntentionalInternalException(string title, string? details = null)
+			: base(title)
 		{
-			this.Message = message;
+			this.Title = title;
+
+			this.Details = details;
 
 			Initialize();
 		}

@@ -2,7 +2,7 @@
 {
     public class SessionException : IntentionalInternalException
     {
-        public SessionException(string message) : base(message)
+        public SessionException(string title, string? details = null) : base(title, details)
         {
         }
 
