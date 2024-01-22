@@ -1,4 +1,5 @@
-﻿using Application.Utils;
+﻿using Application.IServices;
+using Application.Utils;
 using Database.Repositories;
 using Domain.Entities.UserScope;
 using Domain.Exceptions.Authentication;
@@ -9,13 +10,15 @@ using System.Threading.Tasks;
 
 namespace Application.Services
 {
-    public class AuthenticationService
+	public class AuthenticationService : IAuthenticationService<User>
 	{
 		private readonly UserSecurityRepository userSecurityRepository;
 
 		private readonly UserRepository userRepository;
 
 		private readonly UserSessionRepository userSessionRepository;
+
+		private readonly TimeSpan lifeSpanSession = new TimeSpan(14, 0, 0, 0);
 
 		public AuthenticationService(
 			UserSecurityRepository userSecurityRepository,
@@ -29,14 +32,16 @@ namespace Application.Services
 			this.userSessionRepository = userSessionRepository;
 		}
 
-		/// <summary>Регистрирует пользователя на основе входных данных. 
-		/// Создаются такие сущности как User, UserSecurity.</summary>
-		public async Task<User> RegistryAsync(string email, string password, string nickname, string? bio = null)
+		/// <summary>
+		/// Регистрирует пользователя на основе входных данных. 
+		/// Создаются такие сущности как User, UserSecurity.
+		/// </summary>
+		public async Task<User> RegistryAsync(string email, string password, string nickname)
 		{
 
 			using (SHA256 sha256 = SHA256.Create())
 			{
-				email = SHA256Utils.Encrypt(email.ToLower(), sha256);
+				email = SHA256Utils.Encrypt(email, sha256);
 
 				password = SHA256Utils.Encrypt(password, sha256);
 			}
@@ -74,7 +79,7 @@ namespace Application.Services
 		{
 			using (SHA256 sha256 = SHA256.Create())
 			{
-				email = SHA256Utils.Encrypt(email.ToLower(), sha256);
+				email = SHA256Utils.Encrypt(email, sha256);
 
 				password = SHA256Utils.Encrypt(password, sha256);
 			}
@@ -95,7 +100,7 @@ namespace Application.Services
 
 				string sessionKey = SessionMaker.CreateSessionKey();
 
-				await userSessionRepository.CreateAsync(sessionKey, userSecurity.UserId, DateTime.UtcNow.AddDays(14));
+				await userSessionRepository.CreateAsync(sessionKey, userSecurity.UserId, DateTime.UtcNow + lifeSpanSession);
 
 				return sessionKey;
 			}
@@ -117,17 +122,15 @@ namespace Application.Services
 		/// Проверяет sessionKey и на его основе возвращает пользователя
 		/// </summary>
 		/// <returns>User</returns>
-		public async Task<User> CheckSessionkey(string sessionKey)
+		public async Task<User> CheckSessionId(string sessionId)
 		{
-			UserSession? userSession = await userSessionRepository.TryGetByAsync(sessionKey);
+			UserSession? userSession = await userSessionRepository.TryGetByAsync(sessionId);
 
-			if (userSession is null) throw new SessionException("SessionKey isn't found");
+			if (userSession is null) throw new SessionException("Session isn't found");
 
-			if (DateTime.UtcNow > userSession.ExpiredAt) throw new SessionException("SessionKey is already expired");
+			if (DateTime.UtcNow > userSession.ExpiredAt) throw new SessionException("Session is already expired");
 
 			return (await userRepository.TryGetByAsync(userSession.UserId))!;
-
 		}
-
 	}
 }
