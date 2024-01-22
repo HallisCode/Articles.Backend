@@ -1,7 +1,7 @@
 ﻿using AspNet.Dto.Request;
 using FluentValidation;
 
-namespace AspNet.Validation.ModelConfiguration 
+namespace AspNet.Validation.ModelConfiguration
 {
 	public class RegistryValidation : AbstractValidator<RegistryRequest>
 	{

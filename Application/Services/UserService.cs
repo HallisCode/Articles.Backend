@@ -1,7 +1,6 @@
 ﻿using Database.Repositories;
 using Domain.Entities.UserScope;
 using Domain.Exceptions.CRUD;
-using System;
 using System.Threading.Tasks;
 
 namespace Application.Services
@@ -9,7 +8,7 @@ namespace Application.Services
 	public class UserService
 	{
 		private readonly UserRepository userRepository;
-		
+
 		public UserService(UserRepository userRepository)
 		{
 			this.userRepository = userRepository;

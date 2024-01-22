@@ -1,5 +1,4 @@
 ﻿using Domain.Entities.UserScope;
-using Domain.Exceptions.Authentication;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 

@@ -109,7 +109,7 @@ namespace Application.Services
 		}
 
 		/// <summary>
-		/// Производит удаление сессии на основе sessionKey
+		/// Производит удаление сессии на основе sessionId
 		/// </summary>
 		/// <returns></returns>
 		public async Task LogOutAsync(string sessionKey)
@@ -119,9 +119,10 @@ namespace Application.Services
 		}
 
 		/// <summary>
-		/// Проверяет sessionKey и на его основе возвращает пользователя
+		/// Проверяет sessionId и на его основе возвращает пользователя
 		/// </summary>
-		/// <returns>User</returns>
+		/// <returns></returns>
+		/// <exception cref="SessionException"></exception>
 		public async Task<User> CheckSessionId(string sessionId)
 		{
 			UserSession? userSession = await userSessionRepository.TryGetByAsync(sessionId);

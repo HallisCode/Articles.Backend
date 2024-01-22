@@ -1,14 +1,14 @@
+using Application.IServices;
 using Application.Services;
 using AspNet.Middlewares;
 using Database;
 using Database.Repositories;
+using Domain.Entities.UserScope;
+using FluentValidation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using FluentValidation;
-using Application.IServices;
-using Domain.Entities.UserScope;
 
 namespace WebApi
 {

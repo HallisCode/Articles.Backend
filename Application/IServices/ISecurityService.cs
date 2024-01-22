@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace Application.IServices
 {
@@ -24,7 +23,7 @@ namespace Application.IServices
 		public Task<string> CreateTokenChangeEmailOnOldAsync(long userId, string oldEmail, string newEmail);
 
 		/// <summary>
-		/// Создаём токен для подтверждения почты, на новой почте.
+		/// Создаём токен для подтверждения смены почты, на новой почте.
 		/// </summary>
 		/// <returns></returns>
 		public Task<string> CreateTokenChangeEmailOnNewAsync(string jwtTokenData);

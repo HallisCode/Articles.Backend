@@ -1,6 +1,5 @@
 ﻿using Domain.Entities.UserScope;
 using Microsoft.EntityFrameworkCore;
-using System;
 
 
 namespace Database.EntityConfigurations.UserScope

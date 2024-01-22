@@ -69,6 +69,12 @@ namespace Application.Services
 			return articles;
 		}
 
+		/// <summary>
+		/// Создаёт статью
+		/// </summary>
+		/// <returns></returns>
+		/// <exception cref="AlreadyExistException"></exception>
+		/// <exception cref="NotFoundException"></exception>
 		public async Task<Article> CreateAsync(long userId, string title, string content, ICollection<long> tagsId)
 		{
 			Article? article = await articleRepository.TryGetByAsync(title);
@@ -86,6 +92,12 @@ namespace Application.Services
 			return await articleRepository.CreateAsync(title, content, userId, tags);
 		}
 
+		/// <summary>
+		/// Обновляет статью
+		/// </summary>
+		/// <returns></returns>
+		/// <exception cref="NotFoundException"></exception>
+		/// <exception cref="ArgumentsMissingException"></exception>
 		public async Task<Article> UpdateAsync(long id, string? title = null, string? content = null, ICollection<long>? tagsId = null)
 		{
 			Article? article = await articleRepository.TryGetByAsync(id);
@@ -104,6 +116,11 @@ namespace Application.Services
 			return await articleRepository.UpdateAsync(article, title, content, tags);
 		}
 
+		/// <summary>
+		/// Удаляет статью
+		/// </summary>
+		/// <returns></returns>
+		/// <exception cref="NotFoundException"></exception>
 		public async Task DeleteAsync(long id)
 		{
 			Article? article = await articleRepository.TryGetByAsync(id);

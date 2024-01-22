@@ -5,7 +5,7 @@ namespace Application.Utils
 {
 	public sealed class SessionMaker
 	{
-		private SessionMaker ()
+		private SessionMaker()
 		{
 
 		}

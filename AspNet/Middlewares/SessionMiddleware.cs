@@ -22,7 +22,7 @@ namespace AspNet.Middlewares
 
 			bool isHasSessionKey = httpContext.Request.Headers.TryGetValue("sessionKey", out possibleSessionKey);
 
-			if(isHasSessionKey)
+			if (isHasSessionKey)
 			{
 				string sessionKey = possibleSessionKey[0]!;
 

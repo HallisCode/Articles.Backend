@@ -2,7 +2,6 @@
 using Domain.Entities.UserScope;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
 
 namespace Database.EntityConfigurations.ArticleScope
 {

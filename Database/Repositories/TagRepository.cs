@@ -1,10 +1,6 @@
 ﻿using Domain.Entities.ArticleScope;
-using Domain.Entities.UserScope;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Database.Repositories
@@ -42,7 +38,7 @@ namespace Database.Repositories
 		}
 
 
-	public async Task<Tag?> TryGetByAsync(string title)
+		public async Task<Tag?> TryGetByAsync(string title)
 		{
 			Tag? tag = await context.Tags.FirstOrDefaultAsync(tag => EF.Functions.Like(tag.Title, title));
 

@@ -1,5 +1,4 @@
 ﻿using Domain.Entities.UserScope;
-using Domain.Exceptions.CRUD;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;

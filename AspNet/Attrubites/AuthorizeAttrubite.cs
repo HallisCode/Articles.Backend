@@ -1,11 +1,11 @@
-﻿using Domain.Entities.UserScope;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using AspNet.Attrubites;
-using System.Linq;
+﻿using AspNet.Attrubites;
 using AspNet.Dto;
+using Domain.Entities.UserScope;
 using Domain.Exceptions.Authentication;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using System;
+using System.Linq;
 
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
 public class AuthorizeAttribute : Attribute, IAuthorizationFilter
@@ -16,7 +16,7 @@ public class AuthorizeAttribute : Attribute, IAuthorizationFilter
 
 		if (allowAnonymous) return;
 
-		User? user = (User?) context.HttpContext.Items["User"];
+		User? user = (User?)context.HttpContext.Items["User"];
 
 		if (user == null)
 		{

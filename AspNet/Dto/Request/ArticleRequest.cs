@@ -1,5 +1,4 @@
-﻿using Domain.Entities.ArticleScope;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace AspNet.Dto.Request
 {

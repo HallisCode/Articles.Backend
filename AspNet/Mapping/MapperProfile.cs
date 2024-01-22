@@ -5,7 +5,7 @@ using Domain.Entities.UserScope;
 
 namespace WebApi.Mapping
 {
-    public class MapperProfile : Profile
+	public class MapperProfile : Profile
 	{
 		public MapperProfile()
 		{

@@ -1,5 +1,4 @@
 ﻿using Domain.Entities.ArticleScope;
-using Domain.Entities.UserScope;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
