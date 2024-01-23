@@ -11,10 +11,10 @@ namespace AspNet.Controllers
 	[Route("api/[controller]/[action]")]
 	public class AuthenticationController : ControllerBase
 	{
-		private readonly IAuthenticationService<string> authenticationService;
+		private readonly IAuthenticationService<string, string> authenticationService;
 
 
-		public AuthenticationController(IAuthenticationService<string> authenticationService)
+		public AuthenticationController(IAuthenticationService<string, string> authenticationService)
 		{
 			this.authenticationService = authenticationService;
 

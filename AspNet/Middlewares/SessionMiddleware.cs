@@ -16,7 +16,7 @@ namespace AspNet.Middlewares
 			this.next = next;
 		}
 
-		public async Task InvokeAsync(HttpContext httpContext, IAuthenticationSessionService<User> authenticationService)
+		public async Task InvokeAsync(HttpContext httpContext, ISessionService<User, string> authenticationService)
 		{
 			StringValues possibleSessionId;
 
@@ -26,7 +26,7 @@ namespace AspNet.Middlewares
 			{
 				string sessionId = possibleSessionId[0]!;
 
-				httpContext.Items["User"] = await authenticationService.CheckSessionId(sessionId);
+				httpContext.Items["User"] = await authenticationService.CheckSession(sessionId);
 			}
 
 			await next.Invoke(httpContext);

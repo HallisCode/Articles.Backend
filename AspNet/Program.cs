@@ -1,4 +1,5 @@
 using Application.IServices.Authentication;
+using Application.IServices.Security;
 using Application.Services;
 using AspNet.Middlewares;
 using Database;
@@ -34,15 +35,20 @@ namespace WebApi
 			builder.Services.AddAutoMapper(typeof(Program).Assembly);
 			builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
+			// Repositories
 			builder.Services.AddScoped<ArticleRepository>();
 			builder.Services.AddScoped<TagRepository>();
 			builder.Services.AddScoped<UserRepository>();
 			builder.Services.AddScoped<UserSecurityRepository>();
 			builder.Services.AddScoped<UserSessionRepository>();
 
+			// Services
 			builder.Services.AddScoped<ArticleService>();
-			builder.Services.AddScoped<IAuthenticationSessionService<User>, AuthenticationSessionService>();
-			builder.Services.AddScoped<IAuthenticationService<string>, AuthenticationSessionService>();
+
+			builder.Services.AddScoped<ISessionService<User, string>, AuthenticationService>();
+			builder.Services.AddScoped<IAuthenticationService<string, string>, AuthenticationService>();
+
+			builder.Services.AddScoped<ISecurityService, SecurityService>();
 
 
 			WebApplication app = builder.Build();
