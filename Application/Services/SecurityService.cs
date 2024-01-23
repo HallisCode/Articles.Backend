@@ -1,4 +1,4 @@
-﻿using Application.IServices.Security;
+﻿using Application.ServicesBase.Security;
 using Application.Utils;
 using Database.Repositories;
 using Domain.Entities.UserScope;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Application.Services
 {
-    public class SecurityService : IChangeEmail, IChangePassword
+    public class SecurityService : SecurityServiceBase
 	{
 		private readonly UserSecurityRepository userSecurityRepository;
 
@@ -30,7 +30,7 @@ namespace Application.Services
 		/// </summary>
 		/// <returns></returns>
 		/// <exception cref="CredentialDontMatch"></exception>
-		public async Task ChangePasswordAsync(long userId, string oldPassword, string newPassword)
+		public override async Task ChangePasswordAsync(long userId, string oldPassword, string newPassword)
 		{
 			using (SHA256 sha256 = SHA256.Create())
 			{
@@ -55,7 +55,7 @@ namespace Application.Services
 			}
 		}
 
-		public Task ChangeEmailAsync(long userId, string oldPassword, string newPassword)
+		public override Task ChangeEmailAsync(long userId, string oldPassword, string newPassword)
 		{
 			throw new NotImplementedException();
 		}

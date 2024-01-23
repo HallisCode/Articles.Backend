@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 namespace Application.IServices.Security
 {
 	/// <summary>
-	/// 
+	/// Подтверждает изменения, на основе токена, полученного с новой почты.
 	/// </summary>
 	/// <typeparam name="TRequest"> Представление токена, для подтверждения выполнения запросов.</typeparam>
-	public interface IConfirmChange<TRequest>
+	public interface IConfirmChangeOnNewEmail<TRequest>
 	{
-		public Task ConfirmChangeAsync(TRequest token);
+		public Task ConfirmChangeOnNewEmailAsync(TRequest token);
 	}
 }
