@@ -1,4 +1,4 @@
-using Application.IServices;
+using Application.IServices.Authentication;
 using Application.Services;
 using AspNet.Middlewares;
 using Database;
@@ -12,7 +12,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace WebApi
 {
-	public class Program
+    public class Program
 	{
 		public static void Main(string[] args)
 		{
@@ -41,7 +41,7 @@ namespace WebApi
 			builder.Services.AddScoped<UserSessionRepository>();
 
 			builder.Services.AddScoped<ArticleService>();
-			builder.Services.AddScoped<IAuthenticationService<User>, AuthenticationService>();
+			builder.Services.AddScoped<IAuthenticationSessionService<User,string>, AuthenticationSessionService>();
 
 
 			WebApplication app = builder.Build();

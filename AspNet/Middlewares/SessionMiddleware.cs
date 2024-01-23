@@ -1,4 +1,5 @@
-﻿using Application.Services;
+﻿using Application.IServices.Authentication;
+using Domain.Entities.UserScope;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AspNet.Middlewares
 {
-	public class SessionMiddleware
+    public class SessionMiddleware
 	{
 		private readonly RequestDelegate next;
 
@@ -15,18 +16,17 @@ namespace AspNet.Middlewares
 			this.next = next;
 		}
 
-		public async Task InvokeAsync(HttpContext httpContext, AuthenticationService authenticationService)
+		public async Task InvokeAsync(HttpContext httpContext, IAuthenticationSessionService<User,string> authenticationService)
 		{
-
 			StringValues possibleSessionId;
 
-			bool isHasSessionId = httpContext.Request.Headers.TryGetValue("sessionKey", out possibleSessionId);
+			bool isHasSessionId = httpContext.Request.Headers.TryGetValue("sessionId", out possibleSessionId);
 
 			if (isHasSessionId)
 			{
-				string sessionKey = possibleSessionId[0]!;
+				string sessionId = possibleSessionId[0]!;
 
-				httpContext.Items["User"] = await authenticationService.CheckSessionId(sessionKey);
+				httpContext.Items["User"] = await authenticationService.CheckSessionId(sessionId);
 			}
 
 			await next.Invoke(httpContext);

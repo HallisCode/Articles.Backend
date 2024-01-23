@@ -1,64 +1,22 @@
-﻿using Application.Services;
+﻿using Application.IServices.Authentication;
 using AspNet.Attrubites;
 using AspNet.Dto.Request;
-using AspNet.Dto.Response;
-using AspNet.Validation.Extensions;
-using AutoMapper;
-using Domain.Entities.UserScope;
-using FluentValidation;
-using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
 namespace AspNet.Controllers
 {
-	[Authorize]
+    [Authorize]
 	[ApiController]
 	[Route("api/[controller]/[action]")]
 	public class AuthenticationController : ControllerBase
 	{
-		private readonly AuthenticationService authenticationService;
-
-		private readonly IValidator<RegistryRequest> registryValidator;
-
-		private IMapper mapper;
+		private readonly IAuthenticationService<string> authenticationService;
 
 
-		public AuthenticationController(
-			AuthenticationService authenticationService,
-			IMapper mapper,
-			IValidator<RegistryRequest> registryValidator
-			)
+		public AuthenticationController(IAuthenticationService<string> authenticationService)
 		{
 			this.authenticationService = authenticationService;
-
-			this.mapper = mapper;
-
-			this.registryValidator = registryValidator;
-
-		}
-
-		[AllowAnonymous]
-		[HttpPost]
-		public async Task<ActionResult<UserResponse>> Registry(RegistryRequest registryRequest)
-		{
-			ValidationResult validationResult = await registryValidator.ValidateAsync(registryRequest);
-
-			if (!validationResult.IsValid)
-			{
-				validationResult.AddToModelState(this.ModelState);
-
-				return BadRequest(this.ModelState);
-			}
-
-			User user = await authenticationService.RegistryAsync(
-				registryRequest.Email,
-				registryRequest.Password,
-				registryRequest.Nickname,
-				registryRequest.Bio
-				);
-
-			return mapper.Map<User, UserResponse>(user);
 
 		}
 
@@ -73,9 +31,9 @@ namespace AspNet.Controllers
 		}
 
 		[HttpDelete]
-		public async Task<ActionResult> LogOut()
+		public async Task<ActionResult> LogOut([FromBody] string sessiondId)
 		{
-			await authenticationService.LogOutAsync(HttpContext.Request.Headers["sessionKey"]!);
+			await authenticationService.LogOutAsync(sessiondId);
 
 			return Ok();
 		}
