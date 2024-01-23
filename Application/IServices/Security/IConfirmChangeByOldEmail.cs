@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace Application.IServices.Security
 {
@@ -10,7 +6,7 @@ namespace Application.IServices.Security
 	/// Подтверждает изменения, на основе токена, полученного со старой почты.
 	/// </summary>
 	/// <typeparam name="TRequest"> Представление токена, для подтверждения выполнения запросов.</typeparam>
-	public interface IConfirmChangeOnOldEmail<TRequest>
+	public interface IConfirmChangeByOldEmail<TRequest>
 	{
 		public Task ConfirmChangeOnOldEmailAsync(TRequest token);
 	}

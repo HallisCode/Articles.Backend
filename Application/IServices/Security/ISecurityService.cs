@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace Application.IServices.Security
 {
@@ -12,7 +8,7 @@ namespace Application.IServices.Security
 		/// Меняем почту со старой на новую.
 		/// </summary>
 		/// <returns></returns>
-		public Task ChangeEmailAsync(long userId, string oldEmail, string newEmail);
+		public Task ChangeEmailAsync(long userId, string newEmail);
 
 		/// <summary>
 		/// Меняем пароль со старого на новый.

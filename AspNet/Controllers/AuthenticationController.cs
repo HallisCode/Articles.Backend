@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AspNet.Controllers
 {
-    [Authorize]
+	[Authorize]
 	[ApiController]
 	[Route("api/[controller]/[action]")]
 	public class AuthenticationController : ControllerBase

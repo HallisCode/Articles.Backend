@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Application.Services
 {
-    public class SecurityService : SecurityServiceBase
+	public class SecurityService : SecurityServiceBase
 	{
 		private readonly UserSecurityRepository userSecurityRepository;
 
@@ -45,8 +45,6 @@ namespace Application.Services
 			{
 				await userSecurityRepository.UpdateAsync(userSecurity, null, newPassword);
 
-				// TODO : реализовать с реализацией мультисессий, удаление всех сессий
-
 				await userSessionRepository.DeleteAsync(userId);
 			}
 			else
@@ -55,9 +53,17 @@ namespace Application.Services
 			}
 		}
 
-		public override Task ChangeEmailAsync(long userId, string oldPassword, string newPassword)
+
+		public override async Task ChangeEmailAsync(long userId, string newEmail)
 		{
-			throw new NotImplementedException();
+			using (SHA256 sha256 = SHA256.Create())
+			{
+				newEmail = SHA256Utils.Encrypt(newEmail, sha256);
+			}
+
+			UserSecurity userSecurity = (await userSecurityRepository.TryGetByAsync(userId))!;
+
+			await userSecurityRepository.UpdateAsync(userSecurity, newEmail, null);
 		}
 	}
 }

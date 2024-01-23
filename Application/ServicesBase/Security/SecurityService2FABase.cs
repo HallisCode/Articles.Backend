@@ -8,12 +8,11 @@ namespace Application.ServicesBase.Security
 	/// </summary>
 	/// <typeparam name="TRequest"></typeparam>
 	public abstract class SecurityService2FABase<TRequest> : ISecurityService,
-		IConfirmChangeOnNewEmail<TRequest>,
-		IConfirmChangeOnOldEmail<TRequest>
+		IConfirmChangeEmail<TRequest>
 	{
 		public abstract Task ChangePasswordAsync(long userId, string oldPassword, string newPassword);
 
-		public abstract Task ChangeEmailAsync(long userId, string oldEmail, string newEmail);
+		public abstract Task ChangeEmailAsync(long userId, string newEmail);
 
 
 		protected abstract Task SendTokenChangeEmailOnOldEmailAsync(long userId, string oldEmail, string newEmail);
@@ -21,8 +20,8 @@ namespace Application.ServicesBase.Security
 		protected abstract Task SendTokenChangeEmailOnNewEmailAsync(long userId, string newEmail);
 
 
-		public abstract Task ConfirmChangeOnNewEmailAsync(TRequest token);
-
 		public abstract Task ConfirmChangeOnOldEmailAsync(TRequest token);
+
+		public abstract Task ConfirmChangeOnNewEmailAsync(TRequest token);
 	}
 }

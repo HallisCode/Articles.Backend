@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Application.Services
 {
-    public class RegistryService : RegistryServiceBase
+	public class RegistryService : RegistryServiceBase
 	{
 		private readonly UserSecurityRepository userSecurityRepository;
 

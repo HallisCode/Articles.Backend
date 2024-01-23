@@ -13,7 +13,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace WebApi
 {
-    public class Program
+	public class Program
 	{
 		public static void Main(string[] args)
 		{

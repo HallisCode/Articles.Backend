@@ -46,16 +46,22 @@ namespace Database.Repositories
 			return userSession;
 		}
 
-		public async Task DeleteAsync(long id)
+		/// <summary>
+		/// Удаляет сессию по идентификатору.
+		/// </summary>
+		public async Task DeleteAsync(string sessionId)
 		{
-			await context.UserSessions.Where(userSessions => userSessions.Id == id).ExecuteDeleteAsync();
+			await context.UserSessions.Where(userSessions => userSessions.SessionId == sessionId).ExecuteDeleteAsync();
 
 			await context.SaveChangesAsync();
 		}
 
-		public async Task DeleteAsync(string sessionKey)
+		/// <summary>
+		/// Удаляет все сесси связанные с данным пользователем.
+		/// </summary>
+		public async Task DeleteAsync(long userId)
 		{
-			await context.UserSessions.Where(userSessions => userSessions.SessionId == sessionKey).ExecuteDeleteAsync();
+			await context.UserSessions.Where(userSession => userSession.UserId == userId).ExecuteDeleteAsync();
 
 			await context.SaveChangesAsync();
 		}

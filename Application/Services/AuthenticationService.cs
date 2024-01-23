@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Application.Services
 {
-    public class AuthenticationService : AutheticationServiceBase<string>, ISessionService<User, string>
+	public class AuthenticationService : AutheticationServiceBase<string>, ISessionService<User, string>
 	{
 		private readonly UserSecurityRepository userSecurityRepository;
 

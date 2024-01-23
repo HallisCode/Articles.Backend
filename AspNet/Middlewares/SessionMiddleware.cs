@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AspNet.Middlewares
 {
-    public class SessionMiddleware
+	public class SessionMiddleware
 	{
 		private readonly RequestDelegate next;
 
