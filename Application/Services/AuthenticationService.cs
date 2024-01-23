@@ -1,4 +1,5 @@
 ﻿using Application.IServices.Authentication;
+using Application.ServicesBase.Authentication;
 using Application.Utils;
 using Database.Repositories;
 using Domain.Entities.UserScope;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Application.Services
 {
-	public class AuthenticationSessionService : IAuthenticationService<string>, IAuthenticationSessionService<User>
+    public class AuthenticationService : AutheticationServiceBase<string>, ISessionService<User, string>
 	{
 		private readonly UserSecurityRepository userSecurityRepository;
 
@@ -19,7 +20,7 @@ namespace Application.Services
 
 		private readonly TimeSpan lifeSpanSession = new TimeSpan(21, 0, 0, 0);
 
-		public AuthenticationSessionService(
+		public AuthenticationService(
 			UserSecurityRepository userSecurityRepository,
 			UserRepository userRepository,
 			UserSessionRepository userSessionRepository)
@@ -36,7 +37,7 @@ namespace Application.Services
 		/// </summary>
 		/// <returns>SessionKey</returns>
 		/// <exception cref="CredentialDontMatch"></exception>
-		public async Task<string> LogInAsync(string email, string password)
+		public override async Task<string> LogInAsync(string email, string password)
 		{
 			using (SHA256 sha256 = SHA256.Create())
 			{
@@ -75,7 +76,7 @@ namespace Application.Services
 		/// </summary>
 		/// <returns></returns>
 		/// <exception cref="SessionException"></exception>
-		public async Task LogOutAsync(string sessionId)
+		public override async Task LogOutAsync(string sessionId)
 		{
 			UserSession? userSession = await userSessionRepository.TryGetByAsync(sessionId);
 
@@ -89,7 +90,7 @@ namespace Application.Services
 		/// </summary>
 		/// <returns></returns>
 		/// <exception cref="SessionException"></exception>
-		public async Task<User> CheckSessionId(string sessionId)
+		public async Task<User> CheckSession(string sessionId)
 		{
 			UserSession? userSession = await userSessionRepository.TryGetByAsync(sessionId);
 

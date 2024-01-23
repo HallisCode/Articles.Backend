@@ -1,4 +1,4 @@
-﻿using Application.IServices;
+﻿using Application.ServicesBase.Registry;
 using Application.Utils;
 using Database.Repositories;
 using Domain.Entities.UserScope;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Application.Services
 {
-	public class RegistryService : IRegistryService
+    public class RegistryService : RegistryServiceBase
 	{
 		private readonly UserSecurityRepository userSecurityRepository;
 
@@ -28,7 +28,7 @@ namespace Application.Services
 		/// Регистрирует пользователя на основе входных данных. 
 		/// Создаются такие сущности как User, UserSecurity.
 		/// </summary>
-		public async Task RegistryAsync(string email, string password, string nickname)
+		public override async Task RegistryAsync(string email, string password, string nickname)
 		{
 			using (SHA256 sha256 = SHA256.Create())
 			{

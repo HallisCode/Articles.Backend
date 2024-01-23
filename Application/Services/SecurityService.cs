@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Application.Services
 {
-    public class SecurityService : ISecurityService
+    public class SecurityService : IChangeEmail, IChangePassword
 	{
 		private readonly UserSecurityRepository userSecurityRepository;
 
@@ -55,7 +55,7 @@ namespace Application.Services
 			}
 		}
 
-		public Task ChangeEmaildAsync(long userId, string oldPassword, string newPassword)
+		public Task ChangeEmailAsync(long userId, string oldPassword, string newPassword)
 		{
 			throw new NotImplementedException();
 		}
