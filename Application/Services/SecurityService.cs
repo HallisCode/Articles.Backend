@@ -1,4 +1,4 @@
-﻿using Application.IServices;
+﻿using Application.IServices.Security;
 using Application.Utils;
 using Database.Repositories;
 using Domain.Entities.UserScope;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Application.Services
 {
-	public class SecurityService : ISecurityService
+    public class SecurityService : ISecurityService
 	{
 		private readonly UserSecurityRepository userSecurityRepository;
 
@@ -55,19 +55,9 @@ namespace Application.Services
 			}
 		}
 
-		public Task<string> CreateTokenChangeEmailOnOldAsync(long userId, string oldEmail, string newEmail)
+		public Task ChangeEmaildAsync(long userId, string oldPassword, string newPassword)
 		{
 			throw new NotImplementedException();
-		}
-
-		public Task<string> CreateTokenChangeEmailOnNewAsync(string jwtTokenData)
-		{
-			throw new System.NotImplementedException();
-		}
-
-		public Task ConfirmEmailChangeAsync(string jwtTokenData)
-		{
-			throw new System.NotImplementedException();
 		}
 	}
 }

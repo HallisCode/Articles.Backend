@@ -1,4 +1,4 @@
-﻿using Application.IServices;
+﻿using Application.IServices.Authentication;
 using Application.Utils;
 using Database.Repositories;
 using Domain.Entities.UserScope;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Application.Services
 {
-	public class AuthenticationService : IAuthenticationService<User>
+    public class AuthenticationSessionService : IAuthenticationSessionService<User, string>
 	{
 		private readonly UserSecurityRepository userSecurityRepository;
 
@@ -20,7 +20,7 @@ namespace Application.Services
 
 		private readonly TimeSpan lifeSpanSession = new TimeSpan(21, 0, 0, 0);
 
-		public AuthenticationService(
+		public AuthenticationSessionService(
 			UserSecurityRepository userSecurityRepository,
 			UserRepository userRepository,
 			UserSessionRepository userSessionRepository)
@@ -30,42 +30,6 @@ namespace Application.Services
 			this.userRepository = userRepository;
 
 			this.userSessionRepository = userSessionRepository;
-		}
-
-		/// <summary>
-		/// Регистрирует пользователя на основе входных данных. 
-		/// Создаются такие сущности как User, UserSecurity.
-		/// </summary>
-		public async Task<User> RegistryAsync(string email, string password, string nickname)
-		{
-			using (SHA256 sha256 = SHA256.Create())
-			{
-				email = SHA256Utils.Encrypt(email, sha256);
-
-				password = SHA256Utils.Encrypt(password, sha256);
-			}
-
-			User? user;
-
-			UserSecurity? userSecurity = await userSecurityRepository.TryGetByAsync(email);
-
-			if (userSecurity is null)
-			{
-				user = await userRepository.TryGetByAsync(nickname);
-
-				if (user is not null) throw new AlreadyExistException("This nickname is already claimed");
-
-
-				user = await userRepository.CreateAsync(nickname);
-
-				await userSecurityRepository.CreateAsync(email, password, user.Id);
-			}
-			else
-			{
-				throw new AlreadyExistException("This email is already registried");
-			}
-
-			return user;
 		}
 
 		/// <summary>
