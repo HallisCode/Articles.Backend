@@ -41,7 +41,8 @@ namespace WebApi
 			builder.Services.AddScoped<UserSessionRepository>();
 
 			builder.Services.AddScoped<ArticleService>();
-			builder.Services.AddScoped<IAuthenticationSessionService<User,string>, AuthenticationSessionService>();
+			builder.Services.AddScoped<IAuthenticationSessionService<User>, AuthenticationSessionService>();
+			builder.Services.AddScoped<IAuthenticationService<string>, AuthenticationSessionService>();
 
 
 			WebApplication app = builder.Build();

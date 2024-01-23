@@ -3,14 +3,13 @@ using Application.Utils;
 using Database.Repositories;
 using Domain.Entities.UserScope;
 using Domain.Exceptions.Authentication;
-using Domain.Exceptions.CRUD;
 using System;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace Application.Services
 {
-    public class AuthenticationSessionService : IAuthenticationSessionService<User, string>
+	public class AuthenticationSessionService : IAuthenticationService<string>, IAuthenticationSessionService<User>
 	{
 		private readonly UserSecurityRepository userSecurityRepository;
 

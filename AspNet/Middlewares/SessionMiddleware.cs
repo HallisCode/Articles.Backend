@@ -16,7 +16,7 @@ namespace AspNet.Middlewares
 			this.next = next;
 		}
 
-		public async Task InvokeAsync(HttpContext httpContext, IAuthenticationSessionService<User,string> authenticationService)
+		public async Task InvokeAsync(HttpContext httpContext, IAuthenticationSessionService<User> authenticationService)
 		{
 			StringValues possibleSessionId;
 
