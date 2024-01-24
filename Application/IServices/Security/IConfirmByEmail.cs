@@ -3,11 +3,11 @@
 namespace Application.IServices.Security
 {
 	/// <summary>
-	/// Подтверждает изменения, на основе токена, полученного с новой почты.
+	/// Подтверждает запросы, через токен, полученный на почту.
 	/// </summary>
 	/// <typeparam name="TRequest"> Представление токена, для подтверждения выполнения запросов.</typeparam>
-	public interface IConfirmChangeByNewEmail<TRequest>
+	public interface IConfirmByEmail<TRequest>
 	{
-		public Task ConfirmChangeOnNewEmailAsync(TRequest token);
+		public Task ConfirmByEmailAsync(TRequest token);
 	}
 }
