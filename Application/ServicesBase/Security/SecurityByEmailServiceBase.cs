@@ -7,7 +7,7 @@ namespace Application.ServicesBase.Security
 	/// Представляет семейство сервисов изменения данных безопасности, где почта меняется через подтверждение.
 	/// </summary>
 	/// <typeparam name="TRequest"></typeparam>
-	public abstract class SecurityService2FABase<TRequest> : ISecurityService,
+	public abstract class SecurityByEmailServiceBase<TRequest> : ISecurityService,
 		IConfirmChangeEmail<TRequest>
 	{
 		public abstract Task ChangePasswordAsync(long userId, string oldPassword, string newPassword);

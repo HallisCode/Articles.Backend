@@ -8,7 +8,7 @@ namespace Application.ServicesBase.Authentication
 	/// </summary>
 	/// <typeparam name="TToken">Тип данных идентифицирующих пользователя.</typeparam>
 	/// <typeparam name="TRequest">Представление токена, для подтверждения запросов</typeparam>
-	public abstract class Authetication2FAServiceBase<TToken, TRequest> : IAuthenticationService<TToken, object>, IConfirmLogIn<TToken, TRequest>
+	public abstract class AutheticationByEmailServiceBase<TToken, TRequest> : IAuthenticationService<TToken, object>, IConfirmLogIn<TToken, TRequest>
 	{
 		public abstract Task<object> LogInAsync(string email, string password);
 
