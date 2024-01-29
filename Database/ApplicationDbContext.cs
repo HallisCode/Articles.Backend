@@ -24,6 +24,11 @@ namespace Database
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
+			modelBuilder.UseDatabaseTemplate("template0");
+
+			modelBuilder.HasCollation("insensitiveCase", "und-u-ks-level1", "icu", false);
+
+
 			modelBuilder.ApplyConfiguration(new UserSecurityConfiguration());
 
 			modelBuilder.ApplyConfiguration(new ArticleConfiguration());
@@ -37,6 +42,11 @@ namespace Database
 			modelBuilder.ApplyConfiguration(new UserConfiguration());
 
 			modelBuilder.ApplyConfiguration(new UserSessionConfiguration());
+		}
+
+		protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+		{
+			configurationBuilder.Properties<string>().UseCollation("insensitiveCase");
 		}
 
 	}
