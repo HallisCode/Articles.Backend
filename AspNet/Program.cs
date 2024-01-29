@@ -1,15 +1,19 @@
 using Application.IServices.Authentication;
+using Application.IServices.Registry;
 using Application.IServices.Security;
 using Application.Services;
 using AspNet.Middlewares;
 using Database;
 using Database.Repositories;
 using Domain.Entities.UserScope;
+using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using FluentValidation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Configuration;
+using AspNet.Validation;
 
 namespace WebApi
 {
@@ -19,21 +23,25 @@ namespace WebApi
 		{
 			var builder = WebApplication.CreateBuilder(args);
 
-
 			// Прочие настройки
-
 			string? connectPostresql = builder.Configuration["ConnectionStrings:Postgresql"];
 
+			#region Services
 
-			// Добавление services
-
+			// Extensions
 			builder.Services.AddControllers();
 			builder.Services.AddSwaggerGen();
 
 			builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectPostresql), ServiceLifetime.Scoped);
 
 			builder.Services.AddAutoMapper(typeof(Program).Assembly);
+
 			builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+			builder.Services.AddFluentValidationAutoValidation(configuration =>
+			{
+				configuration.EnableBodyBindingSourceAutomaticValidation = true;
+				configuration.OverrideDefaultResultFactoryWith<CustomResultFactory>();
+			});
 
 			// Repositories
 			builder.Services.AddScoped<ArticleRepository>();
@@ -50,20 +58,20 @@ namespace WebApi
 
 			builder.Services.AddScoped<ISecurityService, SecurityService>();
 
+			builder.Services.AddScoped<IRegistryService, RegistryService>();
+
+			#endregion
 
 			WebApplication app = builder.Build();
 
-
 			// Добавление Swagger
-
 			if (app.Environment.IsDevelopment())
 			{
 				app.UseSwagger();
 				app.UseSwaggerUI();
 			}
 
-
-			// Добавление middleware
+			#region Middlewares
 
 			app.UseExceptionMiddleware();
 
@@ -73,12 +81,15 @@ namespace WebApi
 
 			app.UseAuthorization();
 
+			#endregion
 
-			// Остальное
+			#region Other
 
 			app.MapControllers();
 
 			app.Run();
+
+			#endregion
 		}
 	}
 }

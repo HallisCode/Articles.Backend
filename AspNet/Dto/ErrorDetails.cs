@@ -6,9 +6,9 @@
 
 		public string Title { get; private set; }
 
-		public string? Details { get; private set; }
+		public object? Details { get; private set; }
 
-		public ErrorDetails(string typeError, string title, string? details = null)
+		public ErrorDetails(string typeError, string title, object? details = null)
 		{
 			this.TypeError = typeError;
 

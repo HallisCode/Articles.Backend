@@ -30,7 +30,7 @@ namespace AspNet.Controllers
 				);
 		}
 
-		[HttpDelete]
+		[HttpPost]
 		public async Task<ActionResult> LogOut([FromBody] string sessiondId)
 		{
 			await authenticationService.LogOutAsync(sessiondId);

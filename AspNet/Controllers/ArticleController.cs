@@ -21,19 +21,14 @@ namespace WebApi.Controllers
 	{
 		private readonly ArticleService articleService;
 
-		private readonly IValidator<ArticleRequest> articleValidator;
-
 		private readonly IMapper mapper;
 
 
 		public ArticleController(
 			ArticleService articleService,
-			IMapper mapper,
-			IValidator<ArticleRequest> articleValidator)
+			IMapper mapper)
 		{
 			this.articleService = articleService;
-
-			this.articleValidator = articleValidator;
 
 			this.mapper = mapper;
 		}
@@ -66,17 +61,8 @@ namespace WebApi.Controllers
 		}
 
 		[HttpPost]
-		public async Task<ActionResult<ArticleResponse>> CreateAsync(ArticleRequest articleRequest)
+		public async Task<ActionResult<ArticleResponse>> CreateAsync([FromBody] ArticleRequest articleRequest)
 		{
-			ValidationResult validationResult = articleValidator.Validate(articleRequest);
-
-			if (!validationResult.IsValid)
-			{
-				validationResult.AddToModelState(this.ModelState);
-
-				return BadRequest(this.ModelState);
-			}
-
 			Article article = await articleService.CreateAsync(
 				userId: ((User)HttpContext.Items["User"]!).Id,
 				title: articleRequest.Title,
@@ -90,15 +76,6 @@ namespace WebApi.Controllers
 		[HttpPost]
 		public async Task<ActionResult> UpdateAsync(long id, [FromBody] ArticleRequest articleRequest)
 		{
-			ValidationResult validationResult = articleValidator.Validate(articleRequest);
-
-			if (!validationResult.IsValid)
-			{
-				validationResult.AddToModelState(this.ModelState);
-
-				return BadRequest(this.ModelState);
-			}
-
 			await articleService.UpdateAsync(
 				id: id,
 				title: articleRequest.Title,
