@@ -19,14 +19,16 @@ namespace Database.Repositories
 
 		public async Task<UserSession?> TryGetByAsync(string sessionKey)
 		{
-			UserSession? userSession = await context.UserSessions.FirstOrDefaultAsync(userSession => userSession.SessionId == sessionKey);
+			UserSession? userSession = await context.UserSessions.AsNoTracking()
+				.FirstOrDefaultAsync(userSession => userSession.SessionId == sessionKey);
 
 			return userSession;
 		}
 
 		public async Task<UserSession?> TryGetByAsync(long userId)
 		{
-			UserSession? userSession = await context.UserSessions.FirstOrDefaultAsync(userSession => userSession.UserId == userId);
+			UserSession? userSession = await context.UserSessions.AsNoTracking()
+				.FirstOrDefaultAsync(userSession => userSession.UserId == userId);
 
 			return userSession;
 		}

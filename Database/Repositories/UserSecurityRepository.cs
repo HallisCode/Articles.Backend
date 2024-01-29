@@ -17,14 +17,16 @@ namespace Database.Repositories
 
 		public async Task<UserSecurity?> TryGetByAsync(string email)
 		{
-			UserSecurity? userSecurity = await context.UserSecurity.FirstOrDefaultAsync(userSecurity => userSecurity.Email == email);
+			UserSecurity? userSecurity = await context.UserSecurity.AsNoTracking()
+				.FirstOrDefaultAsync(userSecurity => userSecurity.Email == email);
 
 			return userSecurity;
 		}
 
 		public async Task<UserSecurity?> TryGetByAsync(long userId)
 		{
-			UserSecurity? userSecurity = await context.UserSecurity.FirstOrDefaultAsync(userSecurity => userSecurity.UserId == userId);
+			UserSecurity? userSecurity = await context.UserSecurity.AsNoTracking()
+				.FirstOrDefaultAsync(userSecurity => userSecurity.UserId == userId);
 
 			return userSecurity;
 		}

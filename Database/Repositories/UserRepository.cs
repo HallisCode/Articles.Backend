@@ -18,7 +18,8 @@ namespace Database.Repositories
 
 		public async Task<User?> TryGetByAsync(long id)
 		{
-			User? user = await context.Users.FirstOrDefaultAsync(user => user.Id == id);
+			User? user = await context.Users.AsNoTracking()
+				.FirstOrDefaultAsync(user => user.Id == id);
 
 			return user;
 		}
@@ -26,7 +27,8 @@ namespace Database.Repositories
 
 		public async Task<User?> TryGetByAsync(string nickname)
 		{
-			User? user = await context.Users.FirstOrDefaultAsync(user => user.Nickname == nickname);
+			User? user = await context.Users.AsNoTracking()
+				.FirstOrDefaultAsync(user => user.Nickname == nickname);
 
 			return user;
 		}

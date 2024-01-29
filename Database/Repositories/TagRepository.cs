@@ -18,7 +18,8 @@ namespace Database.Repositories
 
 		public async Task<Tag?> TryGetByAsync(long id)
 		{
-			Tag? tag = await context.Tags.FirstOrDefaultAsync(tag => tag.Id == id);
+			Tag? tag = await context.Tags.AsNoTracking()
+				.FirstOrDefaultAsync(tag => tag.Id == id);
 
 			return tag;
 		}
@@ -40,7 +41,8 @@ namespace Database.Repositories
 
 		public async Task<Tag?> TryGetByAsync(string title)
 		{
-			Tag? tag = await context.Tags.FirstOrDefaultAsync(tag => EF.Functions.Like(tag.Title, title));
+			Tag? tag = await context.Tags.AsNoTracking()
+				.FirstOrDefaultAsync(tag => EF.Functions.Like(tag.Title, title));
 
 			return tag;
 		}

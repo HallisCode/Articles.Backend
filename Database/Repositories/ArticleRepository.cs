@@ -20,19 +20,22 @@ namespace Database.Repositories
 
 		public async Task<Article?> TryGetByAsync(long id)
 		{
-			return await context.Articles.AsNoTracking().Include(article => article.Tags).Include(article => article.Author)
+			return await context.Articles.AsNoTracking()
+				.Include(article => article.Tags).Include(article => article.Author)
 				.SingleOrDefaultAsync(article => article.Id == id);
 		}
 
 		public async Task<Article?> TryGetByAsync(string title)
 		{
-			return await context.Articles.AsNoTracking().Include(article => article.Tags).Include(article => article.Author)
+			return await context.Articles.AsNoTracking()
+				.Include(article => article.Tags).Include(article => article.Author)
 				.FirstOrDefaultAsync(article => EF.Functions.Like(article.Title, $"%{title}%"));
 		}
 
 		public async Task<List<Article>?> TryGetByAsync(ICollection<Tag> tags)
 		{
-			return await context.Articles.AsNoTracking().Include(article => article.Tags).Include(article => article.Author)
+			return await context.Articles.AsNoTracking()
+				.Include(article => article.Tags).Include(article => article.Author)
 				.Where(article => article.Tags
 				.Where(tag => tags.Contains(tag)).Count() == tags.Count())
 				.ToListAsync();
