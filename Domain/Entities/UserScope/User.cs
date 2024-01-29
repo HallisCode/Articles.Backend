@@ -1,4 +1,5 @@
 ﻿using Domain.Entities.ArticleScope;
+using Domain.Enum;
 using System;
 using System.Collections.Generic;
 
@@ -11,6 +12,8 @@ namespace Domain.Entities.UserScope
 		public string Nickname { get; set; }
 
 		public DateTime RegistredAt { get; set; }
+
+		public UserRole Role { get; set; }
 
 		public string Bio { get; set; }
 
@@ -27,11 +30,13 @@ namespace Domain.Entities.UserScope
 
 		#region Constructors
 
-		private User(string nickname, DateTime registredAt, string bio)
+		private User(string nickname, DateTime registredAt, UserRole role, string bio)
 		{
 			this.Nickname = nickname;
 
 			this.RegistredAt = registredAt;
+
+			this.Role = role;
 
 			this.Bio = bio;
 		}
