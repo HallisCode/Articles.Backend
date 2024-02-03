@@ -41,7 +41,12 @@ namespace AspNet.Throttle.Middlewares
 
             Endpoint? endpoint = httpContext.GetEndpoint();
 
-            if (endpoint is null) await next.Invoke(httpContext);
+            if (endpoint is null)
+            {
+                await next.Invoke(httpContext);
+
+                return;
+			} 
 
 
             ControllerActionDescriptor endpointController = endpoint.Metadata.GetMetadata<ControllerActionDescriptor>()!;
