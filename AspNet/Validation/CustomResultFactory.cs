@@ -5,26 +5,26 @@ using SharpGrip.FluentValidation.AutoValidation.Mvc.Results;
 
 namespace AspNet.Validation
 {
-	public class CustomResultFactory : IFluentValidationAutoValidationResultFactory
-	{
-		public IActionResult CreateActionResult(ActionExecutingContext context, ValidationProblemDetails? validationProblemDetails)
-		{
-			ErrorDetails errorDetails;
+    public class CustomResultFactory : IFluentValidationAutoValidationResultFactory
+    {
+        public IActionResult CreateActionResult(ActionExecutingContext context, ValidationProblemDetails? validationProblemDetails)
+        {
+            ErrorDetails errorDetails;
 
-			if (validationProblemDetails is not null)
-			{
-				errorDetails = new ErrorDetails(
-					typeError: "ValidationError",
-					title: validationProblemDetails.Title,
-					details: validationProblemDetails.Errors
-					);
-			}
-			else
-			{
-				errorDetails = new ErrorDetails("ValidationError", "validator failure");
-			}
+            if (validationProblemDetails is not null)
+            {
+                errorDetails = new ErrorDetails(
+                    typeError: "ValidationError",
+                    title: validationProblemDetails.Title,
+                    details: validationProblemDetails.Errors
+                    );
+            }
+            else
+            {
+                errorDetails = new ErrorDetails("ValidationError", "validator failure");
+            }
 
-			return new BadRequestObjectResult(errorDetails);
-		}
-	}
+            return new BadRequestObjectResult(errorDetails);
+        }
+    }
 }

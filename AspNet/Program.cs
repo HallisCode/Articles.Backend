@@ -12,8 +12,10 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Configuration;
 using AspNet.Validation;
+using AspNet.Authentication;
+using System;
+using AspNet.Throttle.Middlewares;
 
 namespace WebApi
 {
@@ -32,6 +34,8 @@ namespace WebApi
 			builder.Services.AddControllers();
 			builder.Services.AddSwaggerGen();
 
+			builder.Services.AddMemoryCache();
+
 			builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectPostresql), ServiceLifetime.Scoped);
 
 			builder.Services.AddAutoMapper(typeof(Program).Assembly);
@@ -49,9 +53,12 @@ namespace WebApi
 			builder.Services.AddScoped<UserRepository>();
 			builder.Services.AddScoped<UserSecurityRepository>();
 			builder.Services.AddScoped<UserSessionRepository>();
+			builder.Services.AddScoped<ReviewRepository>();
 
-			// Services
+			// Logic-Services
 			builder.Services.AddScoped<ArticleService>();
+			builder.Services.AddScoped<ReviewService>();
+			builder.Services.AddScoped<UserService>();
 
 			builder.Services.AddScoped<ISessionService<User, string>, AuthenticationService>();
 			builder.Services.AddScoped<IAuthenticationService<string, string>, AuthenticationService>();
@@ -73,13 +80,14 @@ namespace WebApi
 
 			#region Middlewares
 
+			app.UseHttpsRedirection();
+
 			app.UseExceptionMiddleware();
 
 			app.UseSessionMiddlewar();
 
-			app.UseHttpsRedirection();
+			app.UseThrottleMiddleware(new ThrottleMiddlewareOptions(120, new TimeSpan(0, 0, 0, 60)));
 
-			app.UseAuthorization();
 
 			#endregion
 
