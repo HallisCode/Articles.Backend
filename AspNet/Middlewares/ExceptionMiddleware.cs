@@ -22,13 +22,15 @@ namespace AspNet.Middlewares
 			{
 				await next.Invoke(httpContext);
 			}
-			catch (IntentionalInternalException exception)
+			catch (HttpErrorBase exception)
 			{
 				httpContext.Response.StatusCode = exception.StatusCode;
 
 				ErrorDetails errorDetails = new ErrorDetails(exception.GetType().Name, exception.Title, exception.Details);
 
 				await httpContext.Response.WriteAsync(JsonSerializer.Serialize(errorDetails));
+
+				return;
 			}
 
 			//catch (Exception exception)
