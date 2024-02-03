@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Application.Services
 {
-	public class UserService
+	public sealed class UserService
 	{
 		private readonly UserRepository userRepository;
 

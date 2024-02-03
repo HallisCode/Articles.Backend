@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Application.Services
 {
-	public class RegistryService : RegistryServiceBase
+	public sealed class RegistryService : RegistryServiceBase
 	{
 		private readonly UserSecurityRepository userSecurityRepository;
 
@@ -32,7 +32,7 @@ namespace Application.Services
 		{
 			using (SHA256 sha256 = SHA256.Create())
 			{
-				email = SHA256Utils.Encrypt(email, sha256);
+				email = SHA256Utils.Encrypt(email.ToLower(), sha256);
 
 				password = SHA256Utils.Encrypt(password, sha256);
 			}

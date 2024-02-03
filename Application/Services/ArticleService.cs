@@ -1,6 +1,8 @@
 ﻿using Database.Repositories;
 using Domain.Entities.ArticleScope;
+using Domain.Entities.UserScope;
 using Domain.Exceptions;
+using Domain.Exceptions.Authorization;
 using Domain.Exceptions.CRUD;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Application.Services
 {
-	public class ArticleService
+	public sealed class ArticleService
 	{
 		private readonly ArticleRepository articleRepository;
 
@@ -37,17 +39,17 @@ namespace Application.Services
 		}
 
 		/// <summary>
-		/// Получаем статью на основе title
+		/// Получаем статьи на основе title
 		/// </summary>
 		/// <returns></returns>
 		/// <exception cref="NotFoundException"></exception>
-		public async Task<Article> GetByAsync(string title)
+		public async Task<List<Article>?> GetByAsync(string title)
 		{
-			Article? article = await articleRepository.TryGetByAsync(title);
+			List<Article>? articles = await articleRepository.TryGetByAsync(title);
 
-			if (article is null) throw new NotFoundException("Article is not found");
+			if (articles is null) throw new NotFoundException("Article is not found");
 
-			return article;
+			return articles;
 		}
 
 		/// <summary>
@@ -75,9 +77,9 @@ namespace Application.Services
 		/// <returns></returns>
 		/// <exception cref="AlreadyExistException"></exception>
 		/// <exception cref="NotFoundException"></exception>
-		public async Task<Article> CreateAsync(long userId, string title, string content, ICollection<long> tagsId)
+		public async Task<Article> CreateAsync(User user, string title, string content, ICollection<long> tagsId)
 		{
-			Article? article = await articleRepository.TryGetByAsync(title);
+			Article? article = (await articleRepository.TryGetByAsync(title))?.FirstOrDefault();
 
 			if (article is not null) throw new AlreadyExistException("Article with the same title is already exist");
 
@@ -89,7 +91,7 @@ namespace Application.Services
 
 			tags = tags.Distinct().ToList();
 
-			return await articleRepository.CreateAsync(title, content, userId, tags);
+			return await articleRepository.CreateAsync(title, content, user.Id, tags);
 		}
 
 		/// <summary>
@@ -98,20 +100,16 @@ namespace Application.Services
 		/// <returns></returns>
 		/// <exception cref="NotFoundException"></exception>
 		/// <exception cref="ArgumentsMissingException"></exception>
-		public async Task<Article> UpdateAsync(long id, string? title = null, string? content = null, ICollection<long>? tagsId = null)
+		public async Task<Article> UpdateAsync(User user, long id, string title, string content, ICollection<long> tagsId)
 		{
 			Article? article = await articleRepository.TryGetByAsync(id);
 
 			if (article is null) throw new NotFoundException("Article with this id isn't found");
 
-
-			if (title is null && content is null && tagsId is null)
-			{
-				throw new ArgumentsMissingException("All arguments is null");
-			}
+			VerifyIsArticleOwner(user, article);
 
 
-			List<Tag>? tags = tagsId is null ? null : await tagRepository.TryGetByAsync(tagsId);
+			List<Tag>? tags = await tagRepository.TryGetByAsync(tagsId);
 
 			return await articleRepository.UpdateAsync(article, title, content, tags);
 		}
@@ -121,14 +119,28 @@ namespace Application.Services
 		/// </summary>
 		/// <returns></returns>
 		/// <exception cref="NotFoundException"></exception>
-		public async Task DeleteAsync(long id)
+		public async Task DeleteAsync(User user, long id)
 		{
 			Article? article = await articleRepository.TryGetByAsync(id);
 
-			if (article is null) throw new NotFoundException("Articles isn't found");
+			if (article is null) throw new NotFoundException("Article isn't found");
+
+			VerifyIsArticleOwner(user, article);
 
 
 			await articleRepository.DeleteAsync(id);
+		}
+
+		/// <summary>
+		/// Верификация того, яваляется ли пользователь автором article
+		/// </summary>
+		/// <exception cref="AccessDeniedException"></exception>
+		private void VerifyIsArticleOwner (User user, Article article)
+		{
+			if (article.AuthorId != user.Id)
+			{
+				throw new AccessDeniedException("You aren't author of this artticle");
+			}
 		}
 
 	}

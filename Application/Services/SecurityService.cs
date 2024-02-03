@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Application.Services
 {
-	public class SecurityService : SecurityServiceBase
+	public sealed class SecurityService : SecurityServiceBase
 	{
 		private readonly UserSecurityRepository userSecurityRepository;
 
@@ -58,7 +58,7 @@ namespace Application.Services
 		{
 			using (SHA256 sha256 = SHA256.Create())
 			{
-				newEmail = SHA256Utils.Encrypt(newEmail, sha256);
+				newEmail = SHA256Utils.Encrypt(newEmail.ToLower(), sha256);
 			}
 
 			UserSecurity userSecurity = (await userSecurityRepository.TryGetByAsync(userId))!;

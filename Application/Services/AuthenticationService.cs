@@ -4,13 +4,14 @@ using Application.Utils;
 using Database.Repositories;
 using Domain.Entities.UserScope;
 using Domain.Exceptions.Authentication;
+using Domain.Exceptions.Authentication.Session;
 using System;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace Application.Services
 {
-	public class AuthenticationService : AutheticationServiceBase<string>, ISessionService<User, string>
+    public sealed class AuthenticationService : AutheticationServiceBase<string>, ISessionService<User, string>
 	{
 		private readonly UserSecurityRepository userSecurityRepository;
 
@@ -41,7 +42,7 @@ namespace Application.Services
 		{
 			using (SHA256 sha256 = SHA256.Create())
 			{
-				email = SHA256Utils.Encrypt(email, sha256);
+				email = SHA256Utils.Encrypt(email.ToLower(), sha256);
 
 				password = SHA256Utils.Encrypt(password, sha256);
 			}
@@ -90,7 +91,7 @@ namespace Application.Services
 		/// </summary>
 		/// <returns></returns>
 		/// <exception cref="SessionException"></exception>
-		public async Task<User> CheckSession(string sessionId)
+		public async Task<User> VerifySession(string sessionId)
 		{
 			UserSession? userSession = await userSessionRepository.TryGetByAsync(sessionId);
 
