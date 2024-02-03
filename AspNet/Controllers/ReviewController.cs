@@ -13,7 +13,7 @@ namespace AspNet.Controllers
 	[Authorize]
 	[ApiController]
 	[Route("api/[controller]/[action]")]
-	public class ReviewController : ControllerBase
+	public sealed class ReviewController : ControllerBase
 	{
 		private readonly ReviewService reviewService;
 

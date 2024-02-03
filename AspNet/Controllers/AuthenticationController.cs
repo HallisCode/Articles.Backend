@@ -1,7 +1,9 @@
 ﻿using Application.IServices.Authentication;
 using AspNet.Authorization.Attrubites;
 using AspNet.Dto.Request;
+using AspNet.Throttle.Attrubites;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
 
 namespace AspNet.Controllers
@@ -9,7 +11,7 @@ namespace AspNet.Controllers
 	[Authorize]
 	[ApiController]
 	[Route("api/[controller]/[action]")]
-	public class AuthenticationController : ControllerBase
+	public sealed class AuthenticationController : ControllerBase
 	{
 		private readonly IAuthenticationService<string, string> authenticationService;
 
@@ -20,6 +22,7 @@ namespace AspNet.Controllers
 
 		}
 
+		[RateLimit("login", 1, 5)]
 		[AllowAnonymous]
 		[HttpPost]
 		public async Task<ActionResult<string>> LogIn(LogInRequest logInModel)

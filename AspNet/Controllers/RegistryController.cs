@@ -9,7 +9,7 @@ namespace AspNet.Controllers
 	[Authorize]
 	[ApiController]
 	[Route("api/[controller]/[action]")]
-	public class RegistryController : ControllerBase
+	public sealed class RegistryController : ControllerBase
 	{
 		private readonly IRegistryService registryService;
 

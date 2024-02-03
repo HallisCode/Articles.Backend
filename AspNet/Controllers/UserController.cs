@@ -11,7 +11,7 @@ namespace AspNet.Controllers
 	[Authorize]
 	[ApiController]
 	[Route("api/[controller]/[action]")]
-	public class UserController : ControllerBase
+	public sealed class UserController : ControllerBase
 	{
 		private readonly UserService userService;
 
