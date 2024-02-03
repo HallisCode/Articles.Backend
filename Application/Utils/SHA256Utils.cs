@@ -14,7 +14,7 @@ namespace Application.Utils
 
 		public static string Encrypt(string data, SHA256 sha256)
 		{
-			return Convert.ToHexString(sha256.ComputeHash(Encoding.UTF8.GetBytes(data))).ToLower();
+			return Convert.ToBase64String(sha256.ComputeHash(Encoding.UTF8.GetBytes(data)));
 		}
 	}
 }
