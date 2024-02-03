@@ -52,6 +52,8 @@ namespace Domain.Entities.ArticleScope
 
 			this.Content = content;
 
+			this.Tags = new List<Tag>();
+
 			this.Tags = tags;
 
 			this.CreatedAt = DateTime.UtcNow;
