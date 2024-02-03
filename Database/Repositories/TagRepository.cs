@@ -42,7 +42,7 @@ namespace Database.Repositories
 		public async Task<Tag?> TryGetByAsync(string title)
 		{
 			Tag? tag = await context.Tags.AsNoTracking()
-				.FirstOrDefaultAsync(tag => EF.Functions.Like(tag.Title, title));
+				.FirstOrDefaultAsync(tag => EF.Functions.ILike(tag.Title, title));
 
 			return tag;
 		}

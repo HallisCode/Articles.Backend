@@ -18,7 +18,7 @@ namespace Database.Repositories
 		public async Task<UserSecurity?> TryGetByAsync(string email)
 		{
 			UserSecurity? userSecurity = await context.UserSecurity.AsNoTracking()
-				.FirstOrDefaultAsync(userSecurity => userSecurity.Email == email);
+				.FirstOrDefaultAsync(userSecurity => EF.Functions.ILike(userSecurity.Email, email));
 
 			return userSecurity;
 		}

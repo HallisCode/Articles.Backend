@@ -25,11 +25,13 @@ namespace Database.Repositories
 				.SingleOrDefaultAsync(article => article.Id == id);
 		}
 
-		public async Task<Article?> TryGetByAsync(string title)
+		public async Task<List<Article>?> TryGetByAsync(string title)
 		{
 			return await context.Articles.AsNoTracking()
 				.Include(article => article.Tags).Include(article => article.Author)
-				.FirstOrDefaultAsync(article => EF.Functions.Like(article.Title, $"%{title}%"));
+				.Where(article => EF.Functions.ILike(article.Title, $"%{title}%"))
+				.Take(10)
+				.ToListAsync();
 		}
 
 		public async Task<List<Article>?> TryGetByAsync(ICollection<Tag> tags)
@@ -47,15 +49,18 @@ namespace Database.Repositories
 
 		public async Task<Article> CreateAsync(string title, string content, long userId, ICollection<Tag> tags)
 		{
+			context.AttachRange(tags);
+
 			Article article = new Article(userId, title, content, tags);
 
 			article.CreatedAt = DateTime.UtcNow;
 
-			article.Tags = tags;
-
 			context.Articles.Add(article);
 
+
 			await context.SaveChangesAsync();
+
+			await context.Entry(article).Reference(article => article.Author).LoadAsync();
 
 			return article;
 		}
@@ -69,7 +74,12 @@ namespace Database.Repositories
 
 			if (content is not null) article.Content = content;
 
-			if (tags is not null) article.Tags = tags;
+			if (tags is not null)
+			{
+				context.AttachRange(tags);
+
+				article.Tags = tags;
+			}
 
 			article.UpdatedAt = DateTime.UtcNow;
 

@@ -17,10 +17,10 @@ namespace Database.Repositories
 
 		#region NullableMethods
 
-		public async Task<UserSession?> TryGetByAsync(string sessionKey)
+		public async Task<UserSession?> TryGetByAsync(string sessionId)
 		{
 			UserSession? userSession = await context.UserSessions.AsNoTracking()
-				.FirstOrDefaultAsync(userSession => userSession.SessionId == sessionKey);
+				.FirstOrDefaultAsync(userSession => userSession.SessionId == sessionId);
 
 			return userSession;
 		}
@@ -37,9 +37,9 @@ namespace Database.Repositories
 
 		#region NotNullableMehdos
 
-		public async Task<UserSession> CreateAsync(string sessionKey, long userId, DateTime expiredAt)
+		public async Task<UserSession> CreateAsync(string sessionId, long userId, DateTime expiredAt)
 		{
-			UserSession userSession = new UserSession(sessionKey, userId, expiredAt);
+			UserSession userSession = new UserSession(sessionId, userId, expiredAt);
 
 			context.Add(userSession);
 
