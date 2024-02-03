@@ -2,6 +2,7 @@
 using AspNet.Authorization.Attrubites;
 using AspNet.Dto.Request;
 using AspNet.Dto.Response;
+using AspNet.Throttle.Attrubites;
 using AutoMapper;
 using Domain.Entities.ArticleScope;
 using Domain.Entities.UserScope;
@@ -48,7 +49,7 @@ namespace WebApi.Controllers
 			return mapper.Map<List<Article>?, List<ArticleResponse>?>(articles);
 		}
 
-	[AllowAnonymous]
+		[AllowAnonymous]
 		[HttpGet]
 		public async Task<ActionResult<ICollection<ArticleResponse>>> GetByTags([FromQuery] long[] tags)
 		{
@@ -57,6 +58,7 @@ namespace WebApi.Controllers
 			return mapper.Map<List<Article>, List<ArticleResponse>>(articles);
 		}
 
+		[RateLimit("create article", 1, 60, true)]
 		[HttpPost]
 		public async Task<ActionResult<ArticleResponse>> CreateAsync([FromBody] ArticleRequest articleRequest)
 		{
