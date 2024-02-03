@@ -1,6 +1,6 @@
 ﻿namespace Domain.Exceptions
 {
-	public class ArgumentsMissingException : IntentionalInternalException
+	public class ArgumentsMissingException : HttpErrorBase
 	{
 		public ArgumentsMissingException(string title, string? details = null) : base(title, details)
 		{

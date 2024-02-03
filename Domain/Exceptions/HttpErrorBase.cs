@@ -2,7 +2,7 @@
 
 namespace Domain.Exceptions
 {
-	public class IntentionalInternalException : Exception
+	public abstract class HttpErrorBase : Exception
 	{
 		public int StatusCode { get; protected set; } = 500;
 
@@ -10,8 +10,8 @@ namespace Domain.Exceptions
 
 		public string? Details { get; protected set; }
 
-		public IntentionalInternalException(string title, string? details = null)
-			: base(title)
+		public HttpErrorBase(string title, string? details = null)
+			: base()
 		{
 			this.Title = title;
 
@@ -21,10 +21,7 @@ namespace Domain.Exceptions
 		}
 
 		// Задаём в классе наследника характеристики для конкретной ошибки.
-		protected virtual void Initialize()
-		{
-
-		}
+		protected abstract void Initialize();
 	}
 
 }

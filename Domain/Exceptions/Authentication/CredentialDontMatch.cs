@@ -1,6 +1,6 @@
 ﻿namespace Domain.Exceptions.Authentication
 {
-	public class CredentialDontMatch : IntentionalInternalException
+	public class CredentialDontMatch : HttpErrorBase
 	{
 		public CredentialDontMatch(string title, string? details = null) : base(title, details)
 		{

@@ -1,6 +1,6 @@
 ﻿namespace Domain.Exceptions.CRUD
 {
-	public class NotFoundException : IntentionalInternalException
+	public class NotFoundException : HttpErrorBase
 	{
 		public NotFoundException(string title, string? details = null) : base(title, details)
 		{

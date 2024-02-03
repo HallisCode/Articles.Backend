@@ -1,14 +1,14 @@
-﻿namespace Domain.Exceptions.Authentication
+﻿namespace Domain.Exceptions.Authentication.Session
 {
-	public class SessionException : IntentionalInternalException
-	{
-		public SessionException(string title, string? details = null) : base(title, details)
-		{
-		}
+    public class SessionException : HttpErrorBase
+    {
+        public SessionException(string title, string? details = null) : base(title, details)
+        {
+        }
 
-		protected override void Initialize()
-		{
-			StatusCode = 401;
-		}
-	}
+        protected override void Initialize()
+        {
+            StatusCode = 401;
+        }
+    }
 }
