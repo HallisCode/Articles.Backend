@@ -16,6 +16,8 @@ using AspNet.Validation;
 using AspNet.Authentication;
 using System;
 using AspNet.Throttle.Middlewares;
+using System.Collections.Generic;
+using AspNet.Throttle;
 
 namespace WebApi
 {
@@ -86,7 +88,15 @@ namespace WebApi
 
 			app.UseSessionMiddlewar();
 
-			app.UseThrottleMiddleware(new ThrottleMiddlewareOptions(120, 60, true));
+			app.UseThrottleMiddleware(new Dictionary<RoleLimits, ThrottleMiddlewareOptions>()
+			{
+				{
+					RoleLimits.anonymous, new ThrottleMiddlewareOptions(144, 60, false) 
+				},
+				{
+					RoleLimits.identifier, new ThrottleMiddlewareOptions(144, 30, false)
+				}
+			});
 
 
 			#endregion

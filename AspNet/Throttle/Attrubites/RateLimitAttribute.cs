@@ -11,13 +11,17 @@ namespace AspNet.Throttle.Attrubites
 
 		public TimeSpan TimeSpan { get; private set; }
 
-		public RateLimitAttribute(string key, int tokenCounts, double seconds)
+		public bool IsRestingMode { get; private set; }
+
+		public RateLimitAttribute(string key, int tokenCounts, double seconds, bool isRestingMode = false)
 		{
 			this.Key = key;
 
 			this.TokenCounts = tokenCounts;
 
 			this.TimeSpan = TimeSpan.FromSeconds(seconds);
+
+			this.IsRestingMode = isRestingMode;
 		}
 	}
 }
