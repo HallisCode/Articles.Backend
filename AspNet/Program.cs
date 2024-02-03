@@ -86,7 +86,7 @@ namespace WebApi
 
 			app.UseSessionMiddlewar();
 
-			app.UseThrottleMiddleware(new ThrottleMiddlewareOptions(120, new TimeSpan(0, 0, 0, 60)));
+			app.UseThrottleMiddleware(new ThrottleMiddlewareOptions(120, 60, true));
 
 
 			#endregion
