@@ -12,7 +12,11 @@ using System.Threading.Tasks;
 
 namespace AspNet.Throttle.Middlewares
 {
-    public sealed class ThrottleMiddleware
+	/// <summary>
+	/// <para>Миддлварь для контроля за количеством запросов во времени к серверу (request/time).</para>
+	/// <para>Задаёт ограничения на основе параметров, пока не попадутся заданные значения, по схеме : controller attribute -> class attribute-> general settings</para>
+	/// </summary>
+	public sealed class ThrottleMiddleware
     {
         private readonly RequestDelegate next;
 
@@ -130,7 +134,9 @@ namespace AspNet.Throttle.Middlewares
             await next.Invoke(httpContext);
         }
 
-
+        /// <summary>
+        /// Контекст ограничения запросов
+        /// </summary>
         private class LimitingContext
         {
             public int TokensCount { get; set; }
@@ -152,7 +158,7 @@ namespace AspNet.Throttle.Middlewares
     }
 
     /// <summary>
-    /// Задаёт общие настройки для всех запросов
+    /// Задаёт общие настройки для всех запросов без параметров
     /// </summary>
     public sealed class ThrottleMiddlewareOptions
     {
