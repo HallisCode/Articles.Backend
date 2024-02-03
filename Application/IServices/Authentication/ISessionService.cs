@@ -14,6 +14,6 @@ namespace Application.IServices.Authentication
 		/// Проверяет существование и действительность сессии.
 		/// </summary>
 		/// <returns>Пользователь данной сесии.</returns>
-		public Task<TUser> CheckSession(TSession session);
+		public Task<TUser> VerifySession(TSession session);
 	}
 }
