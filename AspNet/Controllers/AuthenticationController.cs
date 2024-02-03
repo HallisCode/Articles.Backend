@@ -22,7 +22,7 @@ namespace AspNet.Controllers
 
 		}
 
-		[RateLimit("login", 1, 5)]
+		[RateLimit("login", 5, 60)]
 		[AllowAnonymous]
 		[HttpPost]
 		public async Task<ActionResult<string>> LogIn(LogInRequest logInModel)
