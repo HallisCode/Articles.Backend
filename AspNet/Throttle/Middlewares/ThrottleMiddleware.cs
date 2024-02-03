@@ -56,9 +56,9 @@ namespace AspNet.Throttle.Middlewares
 			MethodInfo typeController = endpointController.MethodInfo;
 
 
-			ThrottleAttrubite? throttleOwner =  typeOwnerController.GetCustomAttribute<ThrottleAttrubite>();
+			RateLimitAttribute? throttleOwner =  typeOwnerController.GetCustomAttribute<RateLimitAttribute>();
 
-            ThrottleAttrubite? throttleController = typeController.GetCustomAttribute<ThrottleAttrubite>();
+            RateLimitAttribute? throttleController = typeController.GetCustomAttribute<RateLimitAttribute>();
 
 
             string additionalKey;
@@ -106,16 +106,13 @@ namespace AspNet.Throttle.Middlewares
             {
                 limitingContext = new LimitingContext(tokenCounts);
 
-				using (ICacheEntry entry = memoryCache.CreateEntry(entryKey))
-				{
-					entry.AbsoluteExpirationRelativeToNow = timeSpan;
-
-					entry.Value = limitingContext;
-				}
+                memoryCache.Set(entryKey, limitingContext, timeSpan);
 			}
 
 			if (isExistLimitingContext && limitingContext.TokensCount <= 0)
 			{
+                if (options.isRestingMode) memoryCache.Set(entryKey, limitingContext, timeSpan);
+
                 string details = $"Too much request to : {additionalKey}";
 
 				TooManyRequestsException exception = new TooManyRequestsException("You're doing too much requests", details);
@@ -157,18 +154,21 @@ namespace AspNet.Throttle.Middlewares
     /// <summary>
     /// Задаёт общие настройки для всех запросов
     /// </summary>
-    public class ThrottleMiddlewareOptions
+    public sealed class ThrottleMiddlewareOptions
     {
         public TimeSpan TimeSpan { get; private set; }
 
         public int TokensCount { get; private set; }
+        
+        public bool isRestingMode { get; private set; }
 
-
-        public ThrottleMiddlewareOptions(int tokensCount, TimeSpan timeSpan)
+        public ThrottleMiddlewareOptions(int tokensCount, double seconds, bool isRestingMode = false)
         {
-            TokensCount = tokensCount;
+            this.TokensCount = tokensCount;
 
-            TimeSpan = timeSpan;
+            this.TimeSpan = TimeSpan.FromSeconds(seconds);
+
+            this.isRestingMode = isRestingMode;
         }
     }
 }
