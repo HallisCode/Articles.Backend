@@ -1,5 +1,5 @@
 ﻿using Application.Services;
-using AspNet.Attrubites;
+using AspNet.Authorization.Attrubites;
 using AspNet.Dto.Response;
 using AutoMapper;
 using Domain.Entities.UserScope;

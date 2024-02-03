@@ -1,5 +1,5 @@
 ﻿using Application.IServices.Registry;
-using AspNet.Attrubites;
+using AspNet.Authorization.Attrubites;
 using AspNet.Dto.Request;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;

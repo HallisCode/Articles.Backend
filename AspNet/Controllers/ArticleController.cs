@@ -1,13 +1,10 @@
 ﻿using Application.Services;
-using AspNet.Attrubites;
+using AspNet.Authorization.Attrubites;
 using AspNet.Dto.Request;
 using AspNet.Dto.Response;
-using AspNet.Validation.Extensions;
 using AutoMapper;
 using Domain.Entities.ArticleScope;
 using Domain.Entities.UserScope;
-using FluentValidation;
-using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -17,7 +14,7 @@ namespace WebApi.Controllers
 	[Authorize]
 	[ApiController]
 	[Route("api/[controller]/[action]")]
-	public class ArticleController : ControllerBase
+	public sealed class ArticleController : ControllerBase
 	{
 		private readonly ArticleService articleService;
 
@@ -44,14 +41,14 @@ namespace WebApi.Controllers
 
 		[AllowAnonymous]
 		[HttpGet]
-		public async Task<ActionResult<ArticleResponse>> GetByTitle(string title)
+		public async Task<ActionResult<List<ArticleResponse>?>> GetByTitle(string title)
 		{
-			Article article = await articleService.GetByAsync(title);
+			List<Article>? articles = await articleService.GetByAsync(title);
 
-			return mapper.Map<Article, ArticleResponse>(article);
+			return mapper.Map<List<Article>?, List<ArticleResponse>?>(articles);
 		}
 
-		[AllowAnonymous]
+	[AllowAnonymous]
 		[HttpGet]
 		public async Task<ActionResult<ICollection<ArticleResponse>>> GetByTags([FromQuery] long[] tags)
 		{
@@ -64,19 +61,20 @@ namespace WebApi.Controllers
 		public async Task<ActionResult<ArticleResponse>> CreateAsync([FromBody] ArticleRequest articleRequest)
 		{
 			Article article = await articleService.CreateAsync(
-				userId: ((User)HttpContext.Items["User"]!).Id,
+				user: (User)HttpContext.Items["User"]!,
 				title: articleRequest.Title,
 				content: articleRequest.Content,
-				tagsId: articleRequest.Tags);
+				tagsId: articleRequest.Tags
+				);
 
 			return mapper.Map<Article, ArticleResponse>(article);
-
 		}
 
 		[HttpPost]
 		public async Task<ActionResult> UpdateAsync(long id, [FromBody] ArticleRequest articleRequest)
 		{
 			await articleService.UpdateAsync(
+				user: (User)HttpContext.Items["User"]!,
 				id: id,
 				title: articleRequest.Title,
 				content: articleRequest.Content,
@@ -89,7 +87,10 @@ namespace WebApi.Controllers
 		[HttpDelete]
 		public async Task<ActionResult> DeleteAsync(long id)
 		{
-			await articleService.DeleteAsync(id);
+			await articleService.DeleteAsync(
+				user: (User)HttpContext.Items["User"]!,
+				id: id
+				);
 
 			return Ok();
 		}

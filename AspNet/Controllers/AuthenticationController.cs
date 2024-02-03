@@ -1,5 +1,5 @@
 ﻿using Application.IServices.Authentication;
-using AspNet.Attrubites;
+using AspNet.Authorization.Attrubites;
 using AspNet.Dto.Request;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -24,16 +24,18 @@ namespace AspNet.Controllers
 		[HttpPost]
 		public async Task<ActionResult<string>> LogIn(LogInRequest logInModel)
 		{
-			return await authenticationService.LogInAsync(
+			string sessionId = await authenticationService.LogInAsync(
 				logInModel.Email,
 				logInModel.Password
 				);
+
+			return sessionId;
 		}
 
 		[HttpPost]
-		public async Task<ActionResult> LogOut([FromBody] string sessiondId)
+		public async Task<ActionResult> LogOut([FromHeader] string sessionId)
 		{
-			await authenticationService.LogOutAsync(sessiondId);
+			await authenticationService.LogOutAsync(sessionId);
 
 			return Ok();
 		}
