@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -83,18 +82,18 @@ namespace AspNet.Throttle.Middlewares
             }
 
             
+            string additionalKey = globalThrottleKey;
 
-            string additionalKey;
+			int tokenCounts = options.TokensCount;
 
-            int tokenCounts;
+			TimeSpan timeSpan = options.TimeSpan;
 
-            TimeSpan timeSpan;
+			bool isRestingMode = options.isRestingMode;
 
-            bool isRestingMode;
 
-            RateLimitAttribute? rateLimitAttribute = GetFirstOrDefault(throttleController, throttleOwner);
+			RateLimitAttribute? rateLimitAttribute = GetFirstOrDefault(throttleController, throttleOwner);
 
-			// Задаём настройки ограничения, в зависимости от того, где они указаны
+			// Задаём настройки, если есть атрибут ограничения
 			if (rateLimitAttribute is not null)
             {
                 additionalKey = rateLimitAttribute.Key;
@@ -105,16 +104,6 @@ namespace AspNet.Throttle.Middlewares
 
                 isRestingMode = rateLimitAttribute.IsRestingMode;
             }
-            else
-            {
-				additionalKey = globalThrottleKey;
-
-				tokenCounts = options.TokensCount;
-
-				timeSpan = options.TimeSpan;
-
-                isRestingMode = options.isRestingMode;
-			}
 
 
 			string entryKey = $"{identifier}:{additionalKey}";
@@ -122,7 +111,6 @@ namespace AspNet.Throttle.Middlewares
             LimitingContext? limitingContext;
 
             bool isExistLimitingContext = memoryCache.TryGetValue<LimitingContext>(entryKey, out limitingContext);
-
 
             if (isExistLimitingContext is false)
             {
