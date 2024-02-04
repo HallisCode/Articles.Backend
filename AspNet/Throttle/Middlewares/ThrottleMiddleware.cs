@@ -1,5 +1,7 @@
 ﻿using AspNet.Dto;
 using AspNet.Throttle.Attrubites;
+using AspNet.Throttle.Enum;
+using AspNet.Throttle.Options;
 using Domain.Entities.UserScope;
 using Domain.Exceptions;
 using Microsoft.AspNetCore.Builder;
@@ -14,23 +16,23 @@ using System.Threading.Tasks;
 
 namespace AspNet.Throttle.Middlewares
 {
-	/// <summary>
-	/// <para>Миддлварь для контроля за количеством запросов во времени к серверу (request/time).</para>
-	/// <para>Задаёт ограничения на основе параметров, пока не попадутся заданные значения, по схеме : controller attribute -> class attribute-> general settings</para>
-	/// </summary>
-	public sealed class ThrottleMiddleware
+    /// <summary>
+    /// <para>Миддлварь для контроля за количеством запросов во времени к серверу (request/time).</para>
+    /// <para>Задаёт ограничения на основе параметров, пока не попадутся заданные значения, по схеме : controller attribute -> class attribute-> general settings</para>
+    /// </summary>
+    public sealed class ThrottleMiddleware
     {
         private readonly RequestDelegate next;
 
         private readonly IMemoryCache memoryCache;
 
-        private readonly Dictionary<RoleLimits, ThrottleMiddlewareOptions> roleLimits;
+        private readonly Dictionary<RoleLimits, ThrottleWindowOptions> roleLimits;
 
 
         private const string globalThrottleKey = "general";
 
 
-        public ThrottleMiddleware(RequestDelegate next, IMemoryCache memoryCache, Dictionary<RoleLimits, ThrottleMiddlewareOptions> roleLimits)
+        public ThrottleMiddleware(RequestDelegate next, IMemoryCache memoryCache, Dictionary<RoleLimits, ThrottleWindowOptions> roleLimits)
         {
             this.next = next;
 
@@ -62,15 +64,15 @@ namespace AspNet.Throttle.Middlewares
 			MethodInfo typeController = endpointController.MethodInfo;
 
             // Настройки throttle от класса, в котором определенн метод
-			RateLimitAttribute? throttleOwner =  typeOwnerController.GetCustomAttribute<RateLimitAttribute>();
+			RateLimitAttributeBase? throttleOwner =  typeOwnerController.GetCustomAttribute<RateLimitAttributeBase>();
             // Настройки throttle от метода
-            RateLimitAttribute? throttleController = typeController.GetCustomAttribute<RateLimitAttribute>();
+            RateLimitAttributeBase? throttleController = typeController.GetCustomAttribute<RateLimitAttributeBase>();
 
             // Определяем идентификатор для ограничения пользователя
             // По умолчанию ip, в случае если пользователь аутентифицирован - его id
             string identifier = httpContext.Request.Host.ToString();
 
-            ThrottleMiddlewareOptions options = roleLimits[RoleLimits.anonymous];
+			ThrottleWindowOptions options = roleLimits[RoleLimits.anonymous];
 
             User? user = (User?)httpContext.Items["User"];
 
@@ -80,18 +82,16 @@ namespace AspNet.Throttle.Middlewares
 
                 identifier = user.Id.ToString();
             }
-
+            
             
             string additionalKey = globalThrottleKey;
 
-			int tokenCounts = options.TokensCount;
+			int tokenCounts = options.TokenLimit;
 
-			TimeSpan timeSpan = options.TimeSpan;
-
-			bool isRestingMode = options.isRestingMode;
+			TimeSpan timeSpan = options.WindowPeriod;
 
 
-			RateLimitAttribute? rateLimitAttribute = GetFirstOrDefault(throttleController, throttleOwner);
+			RateLimitAttributeBase? rateLimitAttribute = GetFirstOrDefault(throttleController, throttleOwner);
 
 			// Задаём настройки, если есть атрибут ограничения
 			if (rateLimitAttribute is not null)
@@ -102,7 +102,6 @@ namespace AspNet.Throttle.Middlewares
 
                 timeSpan = rateLimitAttribute.TimeSpan;
 
-                isRestingMode = rateLimitAttribute.IsRestingMode;
             }
 
 
@@ -121,9 +120,6 @@ namespace AspNet.Throttle.Middlewares
 
 			if (isExistLimitingContext && limitingContext.TokensCount <= 0)
 			{
-				// isRestingMode true заставляет время истечения ограничения обнуляться, пока не пройдёт время ожидания целиком
-				if (isRestingMode) memoryCache.Set(entryKey, limitingContext, timeSpan);
-
                 string details = $"Too much request to : {additionalKey}";
 
 				TooManyRequestsException exception = new TooManyRequestsException("You're sending too much requests", details);
@@ -170,32 +166,12 @@ namespace AspNet.Throttle.Middlewares
 
     public static class ThrottleMiddlewareExtension
     {
-        public static void UseThrottleMiddleware(this IApplicationBuilder app, Dictionary<RoleLimits, ThrottleMiddlewareOptions> roleLimits)
+        public static void UseThrottleMiddleware(this IApplicationBuilder app, Dictionary<RoleLimits, ThrottleOptionsBase> roleLimits)
         {
 
             app.UseMiddleware<ThrottleMiddleware>(roleLimits);
         }
     }
 
-    /// <summary>
-    /// Задаёт общие настройки для всех запросов без параметров
-    /// </summary>
-    public sealed class ThrottleMiddlewareOptions
-    {
-        public TimeSpan TimeSpan { get; private set; }
-
-        public int TokensCount { get; private set; }
-        
-        public bool isRestingMode { get; private set; }
-
-        public ThrottleMiddlewareOptions(int tokensCount, double seconds, bool isRestingMode = false)
-        {
-            this.TokensCount = tokensCount;
-
-            this.TimeSpan = TimeSpan.FromSeconds(seconds);
-
-            this.isRestingMode = isRestingMode;
-        }
-    }
 }
 

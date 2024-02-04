@@ -17,11 +17,12 @@ using AspNet.Authentication;
 using System;
 using AspNet.Throttle.Middlewares;
 using System.Collections.Generic;
-using AspNet.Throttle;
+using AspNet.Throttle.Enum;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace WebApi
 {
-	public class Program
+    public class Program
 	{
 		public static void Main(string[] args)
 		{
@@ -91,10 +92,10 @@ namespace WebApi
 			app.UseThrottleMiddleware(new Dictionary<RoleLimits, ThrottleMiddlewareOptions>()
 			{
 				{
-					RoleLimits.anonymous, new ThrottleMiddlewareOptions(144, 60, false) 
+					RoleLimits.anonymous, new ThrottleMiddlewareOptions(144, 60) 
 				},
 				{
-					RoleLimits.identifier, new ThrottleMiddlewareOptions(144, 30, false)
+					RoleLimits.identifier, new ThrottleMiddlewareOptions(144, 30)
 				}
 			});
 

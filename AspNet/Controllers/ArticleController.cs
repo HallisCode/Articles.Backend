@@ -58,7 +58,6 @@ namespace WebApi.Controllers
 			return mapper.Map<List<Article>, List<ArticleResponse>>(articles);
 		}
 
-		[RateLimit("create article", 1, 60, true)]
 		[HttpPost]
 		public async Task<ActionResult<ArticleResponse>> CreateAsync([FromBody] ArticleRequest articleRequest)
 		{

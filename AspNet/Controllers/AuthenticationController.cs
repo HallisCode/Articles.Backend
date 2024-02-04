@@ -22,7 +22,6 @@ namespace AspNet.Controllers
 
 		}
 
-		[RateLimit("login", 5, 60, true)]
 		[AllowAnonymous]
 		[HttpPost]
 		public async Task<ActionResult<string>> LogIn(LogInRequest logInModel)
