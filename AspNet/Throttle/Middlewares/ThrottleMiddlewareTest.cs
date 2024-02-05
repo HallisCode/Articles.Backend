@@ -1,9 +1,11 @@
 ﻿using AspNet.Dto;
 using AspNet.Throttle.Attrubites;
 using AspNet.Throttle.Enum;
+using AspNet.Throttle.Handlers;
 using AspNet.Throttle.Options;
 using Domain.Entities.UserScope;
 using Domain.Exceptions;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.Extensions.Caching.Memory;
@@ -26,6 +28,9 @@ namespace AspNet.Throttle.Middlewares
 
 		private const string globalThrottleKey = "general";
 
+
+		private readonly ThrottleWindowHandler throttleWindowHandler;
+
 		public ThrottleMiddlewareTest(RequestDelegate next, IMemoryCache memoryCache, Dictionary<RoleLimits, ThrottleOptionsBase> roleLimits)
 		{
 			this.next = next;
@@ -36,6 +41,9 @@ namespace AspNet.Throttle.Middlewares
 			if (roleLimits is null) throw new Exception("RoleLimits is null");
 
 			this.roleLimits = roleLimits;
+
+
+			throttleWindowHandler = new ThrottleWindowHandler(memoryCache);
 		}
 
 		public async Task InvokeAsync(HttpContext httpContext)
@@ -89,57 +97,27 @@ namespace AspNet.Throttle.Middlewares
 
 			string entryKey = $"{identifier}:{additionalKey}";
 
-
-			LimitingContext? limitingContext;
-
-			bool isExistLimitingContext = memoryCache.TryGetValue<LimitingContext>(entryKey, out limitingContext);
+			bool isThrottle = false;
 
 			if (options is ThrottleRestingOptions throttleRestingOptions)
 			{
-				if (isExistLimitingContext is false)
-				{
-					limitingContext = new LimitingContext(throttleRestingOptions.TokenLimit);
 
-					memoryCache.Set(entryKey, limitingContext, throttleRestingOptions.WindowPeriod);
-				}
-
-				if (isExistLimitingContext && limitingContext.TokensCount <= 0)
-				{
-					memoryCache.Set(entryKey, limitingContext, throttleRestingOptions.WindowPeriod);
-
-					await SendError(httpContext.Response, additionalKey);
-
-					return;
-				}
 			}
 			else if (options is ThrottleWindowOptions throttleWindowOptions)
 			{
-				if (isExistLimitingContext is false)
-				{
-					limitingContext = new LimitingContext(throttleWindowOptions.TokenLimit);
-
-					memoryCache.Set(entryKey, limitingContext, throttleWindowOptions.WindowPeriod);
-				}
-
-				if (isExistLimitingContext && limitingContext.TokensCount <= 0)
-				{
-					await SendError(httpContext.Response, additionalKey);
-
-					return;
-				}
+				isThrottle = throttleWindowHandler.Handle(entryKey, throttleWindowOptions);
 			}
 			else if (options is ThrottleSlidingWindowOptions throttleBucketOptions)
 			{
-				if (isExistLimitingContext is false)
-				{
-					limitingContext = new LimitingContext(throttleBucketOptions.TokenLimit);
 
-					memoryCache.Set(entryKey, limitingContext, throttleBucketOptions.Window);
-				}
 			}
 
+			if (isThrottle)
+			{
+				await SendError(httpContext.Response, additionalKey);
 
-			limitingContext.TokensCount--;
+				return;
+			}
 
 			await next.Invoke(httpContext);
 		}
@@ -155,37 +133,6 @@ namespace AspNet.Throttle.Middlewares
 			await httpResponse.WriteAsync(JsonSerializer.Serialize(errorDetails));
 		}
 
-		/// <summary>
-		/// Контекст ограничения запросов
-		/// </summary>
-		private class LimitingContext
-		{
-			public int TokensCount { get; set; }
-
-			public LimitingContext(int tokensCount)
-			{
-				TokensCount = tokensCount;
-			}
-		}
-
-		/// <summary>
-		/// Контекст ограничения запросов
-		/// </summary>
-		private class LimitingContextBucket
-		{
-			public int TokensCount { get; set; }
-
-			public List<int> Segments { get; set; }
-
-			public LimitingContextBucket(int tokensCount, int segments)
-			{
-				TokensCount = tokensCount;
-
-				Segments = new List<int>(segments);
-
-			}
-		}
-
 		private T? GetFirstOrDefault<T>(params T[] array)
 		{
 			foreach (T? obj in array)
@@ -197,6 +144,15 @@ namespace AspNet.Throttle.Middlewares
 			}
 
 			return default(T);
+		}
+	}
+
+	public static class ThrottleMiddlewareTestExtension
+	{
+		public static void UseThrottleMiddlewareTest(this IApplicationBuilder app, Dictionary<RoleLimits, ThrottleOptionsBase> roleLimits)
+		{
+
+			app.UseMiddleware<ThrottleMiddlewareTest>(roleLimits);
 		}
 	}
 }

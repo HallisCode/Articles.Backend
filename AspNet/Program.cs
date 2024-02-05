@@ -19,6 +19,7 @@ using AspNet.Throttle.Middlewares;
 using System.Collections.Generic;
 using AspNet.Throttle.Enum;
 using Microsoft.AspNetCore.RateLimiting;
+using AspNet.Throttle.Options;
 
 namespace WebApi
 {
@@ -89,13 +90,13 @@ namespace WebApi
 
 			app.UseSessionMiddlewar();
 
-			app.UseThrottleMiddleware(new Dictionary<RoleLimits, ThrottleMiddlewareOptions>()
+			app.UseThrottleMiddlewareTest(new Dictionary<RoleLimits, ThrottleOptionsBase>()
 			{
 				{
-					RoleLimits.anonymous, new ThrottleMiddlewareOptions(144, 60) 
+					RoleLimits.anonymous, new ThrottleWindowOptions(1, 60) 
 				},
 				{
-					RoleLimits.identifier, new ThrottleMiddlewareOptions(144, 30)
+					RoleLimits.identifier, new ThrottleWindowOptions(1, 30)
 				}
 			});
 

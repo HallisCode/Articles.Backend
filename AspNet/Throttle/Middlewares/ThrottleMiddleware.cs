@@ -94,15 +94,15 @@ namespace AspNet.Throttle.Middlewares
 			RateLimitAttributeBase? rateLimitAttribute = GetFirstOrDefault(throttleController, throttleOwner);
 
 			// Задаём настройки, если есть атрибут ограничения
-			if (rateLimitAttribute is not null)
-            {
-                additionalKey = rateLimitAttribute.Key;
+			//if (rateLimitAttribute is not null)
+   //         {
+   //             additionalKey = rateLimitAttribute.Key;
 
-                tokenCounts = rateLimitAttribute.TokenCounts;
+   //             tokenCounts = rateLimitAttribute.TokenCounts;
 
-                timeSpan = rateLimitAttribute.TimeSpan;
+   //             timeSpan = rateLimitAttribute.TimeSpan;
 
-            }
+   //         }
 
 
 			string entryKey = $"{identifier}:{additionalKey}";
