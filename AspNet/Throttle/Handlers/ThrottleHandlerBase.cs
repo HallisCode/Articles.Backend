@@ -1,9 +1,10 @@
 ﻿using AspNet.Throttle.Options;
 using Microsoft.Extensions.Caching.Memory;
+using System;
 
 namespace AspNet.Throttle.Handlers
 {
-	public abstract class ThrottleHandlerBase<T> where T : ThrottleOptionsBase
+	public abstract class ThrottleHandlerBase<TOptions> where TOptions : ThrottleOptionsBase
 	{
 		protected readonly IMemoryCache memoryCache;
 
@@ -12,11 +13,7 @@ namespace AspNet.Throttle.Handlers
 			this.memoryCache = memoryCache;
 		}
 
-		/// <summary>
-		/// Обрабатывает правила ограничения запросов.
-		/// </summary>
-		/// <returns>Истратил ли пользователь все токены.</returns>
-		public virtual bool Handle(string key, T options)
+		public virtual bool Handle(string key, TOptions options)
 		{
 			LimitingContextBase? context;
 
@@ -39,7 +36,7 @@ namespace AspNet.Throttle.Handlers
 			return false;
 		}
 
-		protected abstract LimitingContextBase CreateEntry(string key, T options);
+		protected abstract LimitingContextBase CreateEntry(string key, TOptions options);
 
 		protected abstract void ExecuteRules(string key, LimitingContextBase context);
 

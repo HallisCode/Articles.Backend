@@ -6,14 +6,14 @@ namespace AspNet.Throttle.Options
 	{
 		public TimeSpan Window { get; private set; }
 
-		public int SegmentsPerWindow { get; private set; }
+		public int Segments { get; private set; }
 
 
-		public ThrottleSlidingWindowOptions(int tokenLimit, int segmentPerWindow, double window = 300d) : base(tokenLimit)
+		public ThrottleSlidingWindowOptions(int tokenLimit, int segments, double window) : base(tokenLimit)
 		{
 			Window = TimeSpan.FromSeconds(window);
 
-			SegmentsPerWindow = segmentPerWindow;
+			Segments = segments;
 		}
 	}
 }

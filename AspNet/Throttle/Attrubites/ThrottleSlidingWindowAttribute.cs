@@ -3,22 +3,22 @@ using System;
 
 namespace AspNet.Throttle.Attrubites
 {
-	public class RateLimitSlidingWindowAttribute : RateLimitAttributeBase
+	public class ThrottleSlidingWindowAttribute : ThrottleAttributeBase<ThrottleSlidingWindowOptions>
 	{
 		public TimeSpan Window { get; private set; }
 
-		public int SegmentPerWindow { get; private set; }
+		public int Segments { get; private set; }
 
-		public RateLimitSlidingWindowAttribute(string key, int tokenLimit, int segmentPerWindow, double window = 300d) : base(key, tokenLimit)
+		public ThrottleSlidingWindowAttribute(string key, int tokenLimit, int segmentPerWindow, double window) : base(key, tokenLimit)
 		{
 			Window = TimeSpan.FromSeconds(window);
 
-			SegmentPerWindow = segmentPerWindow;
+			Segments = segmentPerWindow;
 		}
 
 		public override ThrottleSlidingWindowOptions GetOptions()
 		{
-			return new ThrottleSlidingWindowOptions(TokenLimit, SegmentPerWindow, Window.TotalSeconds);
+			return new ThrottleSlidingWindowOptions(TokenLimit, Segments, Window.TotalSeconds);
 		}
 	}
 }

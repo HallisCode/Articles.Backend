@@ -20,6 +20,8 @@ using System.Collections.Generic;
 using AspNet.Throttle.Enum;
 using Microsoft.AspNetCore.RateLimiting;
 using AspNet.Throttle.Options;
+using Application.IServices;
+using AspNet.SpecifiedServices;
 
 namespace WebApi
 {
@@ -71,6 +73,9 @@ namespace WebApi
 
 			builder.Services.AddScoped<IRegistryService, RegistryService>();
 
+			// Other
+			builder.Services.AddScoped<IUserReciever<User>, UserReciever>();
+
 			#endregion
 
 			WebApplication app = builder.Build();
@@ -90,16 +95,10 @@ namespace WebApi
 
 			app.UseSessionMiddlewar();
 
-			app.UseThrottleMiddlewareTest(new Dictionary<RoleLimits, ThrottleOptionsBase>()
+			app.UseThrottleMiddleware(new Dictionary<RoleLimits, ThrottleOptionsBase>()
 			{
-				{
-					RoleLimits.anonymous, new ThrottleWindowOptions(1, 60) 
-				},
-				{
-					RoleLimits.identifier, new ThrottleWindowOptions(1, 30)
-				}
+				
 			});
-
 
 			#endregion
 

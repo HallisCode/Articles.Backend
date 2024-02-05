@@ -5,14 +5,14 @@ using System;
 namespace AspNet.Throttle.Attrubites
 {
 	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-	public abstract class RateLimitAttributeBase : Attribute
+	public abstract class ThrottleAttributeBase<T> : Attribute, IThrottleOptions<T> where T : ThrottleOptionsBase
 	{
 		public string Key { get; private set; }
 
 		public int TokenLimit { get; private set; }
 
 
-		public RateLimitAttributeBase(string key, int tokenLimit)
+		public ThrottleAttributeBase(string key, int tokenLimit)
 		{
 			this.Key = key;
 
@@ -20,6 +20,6 @@ namespace AspNet.Throttle.Attrubites
 
 		}
 
-		public abstract ThrottleOptionsBase GetOptions();
+		public abstract T GetOptions();
 	}
 }

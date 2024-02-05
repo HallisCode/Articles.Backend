@@ -20,7 +20,7 @@ namespace AspNet.Throttle.Handlers
 
 		protected override void ExecuteRules(string key, LimitingContextBase context)
 		{
-			LimitingWindowContext _context = (LimitingWindowContext) context;
+			LimitingWindowContext _context = (LimitingWindowContext)context;
 		}
 
 		protected class LimitingWindowContext : LimitingContextBase
