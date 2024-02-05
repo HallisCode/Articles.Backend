@@ -26,7 +26,7 @@ namespace AspNet.Throttle.Handlers
 
 			if (isExistContext && context.TokensCount <= 0)
 			{
-				ExecuteRules(key, context);
+				ExecuteRules(key, context, options);
 
 				return true;
 			}
@@ -38,7 +38,7 @@ namespace AspNet.Throttle.Handlers
 
 		protected abstract LimitingContextBase CreateEntry(string key, TOptions options);
 
-		protected abstract void ExecuteRules(string key, LimitingContextBase context);
+		protected abstract void ExecuteRules(string key, LimitingContextBase context, TOptions options);
 
 		protected virtual void DecrementTokens(LimitingContextBase context)
 		{

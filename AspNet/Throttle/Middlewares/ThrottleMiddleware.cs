@@ -29,7 +29,7 @@ namespace AspNet.Throttle.Middlewares
 		// Настройки логики выполнения
 		public Dictionary<RoleLimits, ThrottleOptionsBase> RoleLimits { get; set; }
 
-		public object Handlers { get; set; }
+		public ThrottleHandlerBase<ThrottleOptionsBase>[] Handlers { get; set; }
 
 
 		public ThrottleMiddleware(RequestDelegate next, IMemoryCache memoryCache, Dictionary<RoleLimits, ThrottleOptionsBase> roleLimits)
@@ -39,6 +39,10 @@ namespace AspNet.Throttle.Middlewares
 			this.memoryCache = memoryCache;
 
 			this.RoleLimits = roleLimits;
+
+			Handlers = new ThrottleHandlerBase<ThrottleOptionsBase>[1];
+
+			Handlers = new (ThrottleHandlerBase<ThrottleOptionsBase>) ThrottleWindowHandler(memoryCache);
 		}
 
 		public async Task InvokeAsync(HttpContext httpContext, IUserReciever<User> userReciever)

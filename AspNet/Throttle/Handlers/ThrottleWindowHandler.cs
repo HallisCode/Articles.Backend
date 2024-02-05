@@ -18,7 +18,7 @@ namespace AspNet.Throttle.Handlers
 			return context;
 		}
 
-		protected override void ExecuteRules(string key, LimitingContextBase context)
+		protected override void ExecuteRules(string key, LimitingContextBase context, ThrottleWindowOptions options)
 		{
 			LimitingWindowContext _context = (LimitingWindowContext)context;
 		}
