@@ -23,6 +23,7 @@ namespace AspNet.Throttle.Handlers
 			LimitingWindowContext _context = (LimitingWindowContext)context;
 		}
 
+
 		protected class LimitingWindowContext : LimitingContextBase
 		{
 			public LimitingWindowContext(int tokensCount) : base(tokensCount)

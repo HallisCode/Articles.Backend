@@ -27,22 +27,15 @@ namespace AspNet.Throttle.Middlewares
 		private const string globalThrottleKey = "general";
 
 		// Настройки логики выполнения
-		public Dictionary<RoleLimits, ThrottleOptionsBase> RoleLimits { get; set; }
+		public Dictionary<ThrottleRole, IThrottleOptions> RoleLimits { get; set; }
 
-		public ThrottleHandlerBase<ThrottleOptionsBase>[] Handlers { get; set; }
-
-
-		public ThrottleMiddleware(RequestDelegate next, IMemoryCache memoryCache, Dictionary<RoleLimits, ThrottleOptionsBase> roleLimits)
+		public ThrottleMiddleware(RequestDelegate next, IMemoryCache memoryCache, Dictionary<ThrottleRole, IThrottleOptions> roleLimits)
 		{
 			this.next = next;
 
 			this.memoryCache = memoryCache;
 
 			this.RoleLimits = roleLimits;
-
-			Handlers = new ThrottleHandlerBase<ThrottleOptionsBase>[1];
-
-			Handlers = new (ThrottleHandlerBase<ThrottleOptionsBase>) ThrottleWindowHandler(memoryCache);
 		}
 
 		public async Task InvokeAsync(HttpContext httpContext, IUserReciever<User> userReciever)
@@ -56,21 +49,23 @@ namespace AspNet.Throttle.Middlewares
 				return;
 			}
 
-			ThrottleAttributeBase<ThrottleOptionsBase>? throttleAttribute = GetThrottleAttrubite(endpoint);
+			IGetterThrottleOptions<IThrottleOptions>? throttleAttribute = GetThrottleAttrubite(endpoint);
 
-
-			string identifier = GetIdentifier(httpContext, userReciever);
+			string identifier = GetIdentifier(httpContext, userReciever, out bool isAnonymous);
 
 			string key = (throttleAttribute?.Key) ?? globalThrottleKey;
 
 			string entryKey = $"{identifier}:{key}";
 
-			ThrottleOptionsBase? options = throttleAttribute?.GetOptions();
+
+			IThrottleOptions? options = isAnonymous is true ? RoleLimits[ThrottleRole.Anonymous] : RoleLimits[ThrottleRole.Identifier];
+
+			options = throttleAttribute?.GetOptions();
 
 			bool isThrottle = false;
 
 
-			ThrottleHandlerBase<ThrottleOptionsBase> throttleHandler = GetThrottleHandlerByOptions(options);
+			IThrottleHandler<IThrottleOptions> throttleHandler = GetThrottleHandlerByOptions(options);
 
 			isThrottle = throttleHandler.Handle(entryKey, options);
 
@@ -85,21 +80,25 @@ namespace AspNet.Throttle.Middlewares
 			await next.Invoke(httpContext);
 		}
 
-		private string GetIdentifier(HttpContext httpContext, IUserReciever<User> userReciever)
+		private string GetIdentifier(HttpContext httpContext, IUserReciever<User> userReciever, out bool isAnonymous)
 		{
+			isAnonymous = false;
+
 			User? user = userReciever.Get();
 
 			if (user is not null)
 			{
+				isAnonymous = true;
+
 				return user.Id.ToString();
 			}
 
 			return httpContext.Request.Host.Host;
 		}
 
-		private ThrottleHandlerBase<ThrottleOptionsBase> GetThrottleHandlerByOptions(ThrottleOptionsBase options)
+		private IThrottleHandler<IThrottleOptions> GetThrottleHandlerByOptions(IThrottleOptions options)
 		{
-			foreach (ThrottleHandlerBase<ThrottleOptionsBase> handler in Handlers)
+			foreach (IThrottleHandler<IThrottleOptions> handler in Handlers)
 			{
 
 				if (handler.GetType().GetGenericArguments()[0] == options.GetType())
@@ -111,7 +110,7 @@ namespace AspNet.Throttle.Middlewares
 			throw new Exception("Необходимый throttle обработчик не найден");
 		}
 
-		private ThrottleAttributeBase<ThrottleOptionsBase>? GetThrottleAttrubite(Endpoint endpoint)
+		private IGetterThrottleOptions<IThrottleOptions>? GetThrottleAttrubite(Endpoint endpoint)
 		{
 			ControllerActionDescriptor endpointController = endpoint.Metadata.GetMetadata<ControllerActionDescriptor>()!;
 
@@ -120,9 +119,9 @@ namespace AspNet.Throttle.Middlewares
 			MethodInfo typeMethod = endpointController.MethodInfo;
 
 
-			ThrottleAttributeBase<ThrottleOptionsBase>? throttleController = typeController.GetCustomAttribute<ThrottleAttributeBase<ThrottleOptionsBase>>();
+			IGetterThrottleOptions<IThrottleOptions>? throttleController = typeController.GetCustomAttribute<ThrottleAttributeBase<IThrottleOptions>>();
 
-			ThrottleAttributeBase<ThrottleOptionsBase>? throttleMethod = typeMethod.GetCustomAttribute<ThrottleAttributeBase<ThrottleOptionsBase>>();
+			IGetterThrottleOptions<IThrottleOptions>? throttleMethod = typeMethod.GetCustomAttribute<ThrottleAttributeBase<IThrottleOptions>>();
 
 			return throttleMethod ?? throttleController;
 		}
@@ -141,7 +140,7 @@ namespace AspNet.Throttle.Middlewares
 
 	public static class ThrottleMiddlewareExtension
 	{
-		public static void UseThrottleMiddleware(this IApplicationBuilder app, Dictionary<RoleLimits, ThrottleOptionsBase> roleLimits)
+		public static void UseThrottleMiddleware(this IApplicationBuilder app, Dictionary<ThrottleRole, IThrottleOptions> roleLimits)
 		{
 			app.UseMiddleware<ThrottleMiddleware>(roleLimits);
 		}

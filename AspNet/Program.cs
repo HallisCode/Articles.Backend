@@ -25,7 +25,7 @@ using AspNet.SpecifiedServices;
 
 namespace WebApi
 {
-    public class Program
+	public class Program
 	{
 		public static void Main(string[] args)
 		{
@@ -39,6 +39,8 @@ namespace WebApi
 			// Extensions
 			builder.Services.AddControllers();
 			builder.Services.AddSwaggerGen();
+
+			builder.Services.AddHttpContextAccessor();
 
 			builder.Services.AddMemoryCache();
 
@@ -95,9 +97,10 @@ namespace WebApi
 
 			app.UseSessionMiddlewar();
 
-			app.UseThrottleMiddleware(new Dictionary<RoleLimits, ThrottleOptionsBase>()
+			app.UseThrottleMiddleware(new Dictionary<ThrottleRole, IThrottleOptions>()
 			{
-				
+				{ThrottleRole.Anonymous, new ThrottleWindowOptions(140, 60) },
+				{ThrottleRole.Identifier, new ThrottleWindowOptions(140,30) }
 			});
 
 			#endregion

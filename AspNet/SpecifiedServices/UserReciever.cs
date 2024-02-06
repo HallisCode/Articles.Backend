@@ -10,9 +10,9 @@ namespace AspNet.SpecifiedServices
 
 		private User? user;
 
-		public UserReciever(HttpContext httpContext)
+		public UserReciever(IHttpContextAccessor httpContextAccessor)
 		{
-			user = (User?) httpContext.Items[key];
+			user = (User?) httpContextAccessor.HttpContext?.Items[key];
 		}
 
 		public User? Get()

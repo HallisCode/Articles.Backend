@@ -6,26 +6,24 @@ using Domain.Entities.UserScope;
 using Domain.Exceptions.Authentication.Session;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
 public class AuthorizeAttribute : Attribute, IAuthorizationFilter
 {
-	private readonly IUserReciever<User> userReciever;
-
-	public AuthorizeAttribute(IUserReciever<User> userReciever)
-	{
-		this.userReciever = userReciever;
-	}
-
 	public void OnAuthorization(AuthorizationFilterContext context)
 	{
 		bool allowAnonymous = context.ActionDescriptor.EndpointMetadata.OfType<AllowAnonymousAttribute>().Any();
 
 		if (allowAnonymous) return;
 
-		User? user = userReciever.Get();
+
+		IUserReciever<User>? userReciever = context.HttpContext.RequestServices.GetService<IUserReciever<User>>();
+
+		User? user = userReciever?.Get();
+
 
 		if (user == null)
 		{

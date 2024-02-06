@@ -5,7 +5,7 @@ using System;
 namespace AspNet.Throttle.Attrubites
 {
 	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-	public abstract class ThrottleAttributeBase<T> : Attribute, IThrottleOptions<T> where T : ThrottleOptionsBase
+	public abstract class ThrottleAttributeBase<TOptions> : Attribute, IGetterThrottleOptions<TOptions> where TOptions : IThrottleOptions
 	{
 		public string Key { get; private set; }
 
@@ -20,6 +20,6 @@ namespace AspNet.Throttle.Attrubites
 
 		}
 
-		public abstract T GetOptions();
+		public abstract TOptions GetOptions();
 	}
 }

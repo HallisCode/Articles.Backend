@@ -4,7 +4,7 @@ using System;
 
 namespace AspNet.Throttle.Handlers
 {
-	public abstract class ThrottleHandlerBase<TOptions> where TOptions : ThrottleOptionsBase
+	public abstract class ThrottleHandlerBase<TOptions> : IThrottleHandler<TOptions> where TOptions : IThrottleOptions
 	{
 		protected readonly IMemoryCache memoryCache;
 

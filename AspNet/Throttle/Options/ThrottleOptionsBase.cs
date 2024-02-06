@@ -1,7 +1,7 @@
 ﻿
 namespace AspNet.Throttle.Options
 {
-    public abstract class ThrottleOptionsBase
+    public abstract class ThrottleOptionsBase : IThrottleOptions
     {
         public int TokenLimit { get; private set; }
 
