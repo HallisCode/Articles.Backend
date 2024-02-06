@@ -14,14 +14,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using AspNet.Validation;
 using AspNet.Authentication;
-using System;
-using AspNet.Throttle.Middlewares;
-using System.Collections.Generic;
-using AspNet.Throttle.Enum;
-using Microsoft.AspNetCore.RateLimiting;
-using AspNet.Throttle.Options;
 using Application.IServices;
 using AspNet.SpecifiedServices;
+using AspNet.Throttle.Middlewares;
 
 namespace WebApi
 {
@@ -93,15 +88,11 @@ namespace WebApi
 
 			app.UseHttpsRedirection();
 
+			app.UseThrottleMiddleware();
+
 			app.UseExceptionMiddleware();
 
 			app.UseSessionMiddlewar();
-
-			app.UseThrottleMiddleware(new Dictionary<ThrottleRole, IThrottleOptions>()
-			{
-				{ThrottleRole.Anonymous, new ThrottleWindowOptions(140, 60) },
-				{ThrottleRole.Identifier, new ThrottleWindowOptions(140,30) }
-			});
 
 			#endregion
 

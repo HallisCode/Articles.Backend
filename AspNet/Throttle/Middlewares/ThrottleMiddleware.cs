@@ -1,19 +1,16 @@
 ﻿using Application.IServices;
-using AspNet.Dto;
 using AspNet.Throttle.Attrubites;
 using AspNet.Throttle.Enum;
-using AspNet.Throttle.Handlers;
 using AspNet.Throttle.Options;
 using Domain.Entities.UserScope;
-using Domain.Exceptions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Net;
 using System.Reflection;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace AspNet.Throttle.Middlewares
@@ -22,127 +19,107 @@ namespace AspNet.Throttle.Middlewares
 	{
 		private readonly RequestDelegate next;
 
-		private readonly IMemoryCache memoryCache;
 
-		private const string globalThrottleKey = "general";
+		private Dictionary<Type, ThrottleDelegate<IThrottleOptions>> handlers;
 
-		// Настройки логики выполнения
-		public Dictionary<ThrottleRole, IThrottleOptions> RoleLimits { get; set; }
+		private Dictionary<ThrottleGroup, IThrottleOptions> throttleGroupSettings;
 
-		public ThrottleMiddleware(RequestDelegate next, IMemoryCache memoryCache, Dictionary<ThrottleRole, IThrottleOptions> roleLimits)
+		private string globalThrottlingKey = "global";
+
+
+		public ThrottleMiddleware(RequestDelegate next)
 		{
 			this.next = next;
 
-			this.memoryCache = memoryCache;
+			handlers = new Dictionary<Type, ThrottleDelegate<IThrottleOptions>>();
 
-			this.RoleLimits = roleLimits;
+			handlers[typeof(ThrottleWindowOptions)] = null;
 		}
 
 		public async Task InvokeAsync(HttpContext httpContext, IUserReciever<User> userReciever)
 		{
 			Endpoint? endpoint = httpContext.GetEndpoint();
 
-			if (endpoint is null)
-			{
-				await next.Invoke(httpContext);
+			if (endpoint is null) await next.Invoke(httpContext);
 
-				return;
-			}
-
-			IGetterThrottleOptions<IThrottleOptions>? throttleAttribute = GetThrottleAttrubite(endpoint);
 
 			string identifier = GetIdentifier(httpContext, userReciever, out bool isAnonymous);
 
-			string key = (throttleAttribute?.Key) ?? globalThrottleKey;
+			string key = globalThrottlingKey;
 
-			string entryKey = $"{identifier}:{key}";
-
-
-			IThrottleOptions? options = isAnonymous is true ? RoleLimits[ThrottleRole.Anonymous] : RoleLimits[ThrottleRole.Identifier];
-
-			options = throttleAttribute?.GetOptions();
-
-			bool isThrottle = false;
+			IThrottleOptions options = isAnonymous ? throttleGroupSettings[ThrottleGroup.Anonymous] : throttleGroupSettings[ThrottleGroup.Identifier];
 
 
-			IThrottleHandler<IThrottleOptions> throttleHandler = GetThrottleHandlerByOptions(options);
+			IThrottleAttribute? throttleAttribute = GetThrottleAttribute(endpoint);
 
-			isThrottle = throttleHandler.Handle(entryKey, options);
-
-
-			if (isThrottle)
+			if (throttleAttribute is not null)
 			{
-				await SendError(httpContext.Response, key);
+				IGetThrottleOptions<IThrottleOptions>? getterOptions = (IGetThrottleOptions<IThrottleOptions>)throttleAttribute;
 
-				return;
+				options = getterOptions.GetOptions();
+
+				key = throttleAttribute.Key;
 			}
+
+			ThrottleDelegate<IThrottleOptions>? handler = GetHandler(options);
+
 
 			await next.Invoke(httpContext);
 		}
 
 		private string GetIdentifier(HttpContext httpContext, IUserReciever<User> userReciever, out bool isAnonymous)
 		{
-			isAnonymous = false;
+			isAnonymous = true;
 
-			User? user = userReciever.Get();
+			string key;
+
+
+			User? user = userReciever.User;
 
 			if (user is not null)
 			{
-				isAnonymous = true;
+				isAnonymous = false;
 
-				return user.Id.ToString();
+				key = user.Id.ToString();
 			}
-
-			return httpContext.Request.Host.Host;
-		}
-
-		private IThrottleHandler<IThrottleOptions> GetThrottleHandlerByOptions(IThrottleOptions options)
-		{
-			foreach (IThrottleHandler<IThrottleOptions> handler in Handlers)
+			else
 			{
-
-				if (handler.GetType().GetGenericArguments()[0] == options.GetType())
-				{
-					return handler;
-				}
+				key = httpContext.Request.Host.Host;
 			}
 
-			throw new Exception("Необходимый throttle обработчик не найден");
+			return key;
 		}
 
-		private IGetterThrottleOptions<IThrottleOptions>? GetThrottleAttrubite(Endpoint endpoint)
+		private ThrottleDelegate<IThrottleOptions>? GetHandler(IThrottleOptions options)
 		{
-			ControllerActionDescriptor endpointController = endpoint.Metadata.GetMetadata<ControllerActionDescriptor>()!;
-
-			TypeInfo typeController = endpointController.ControllerTypeInfo;
-
-			MethodInfo typeMethod = endpointController.MethodInfo;
-
-
-			IGetterThrottleOptions<IThrottleOptions>? throttleController = typeController.GetCustomAttribute<ThrottleAttributeBase<IThrottleOptions>>();
-
-			IGetterThrottleOptions<IThrottleOptions>? throttleMethod = typeMethod.GetCustomAttribute<ThrottleAttributeBase<IThrottleOptions>>();
-
-			return throttleMethod ?? throttleController;
+			return handlers.GetValueOrDefault(options.GetType());
 		}
 
-		private async Task SendError(HttpResponse httpResponse, string overloadEndpoint)
+		private IThrottleAttribute? GetThrottleAttribute(Endpoint endpoint)
 		{
-			string details = $"Too much request to : {overloadEndpoint}";
+			ControllerActionDescriptor? endpointController = endpoint.Metadata.GetMetadata<ControllerActionDescriptor>();
 
-			TooManyRequestsException exception = new TooManyRequestsException("You're sending too much requests", details);
+			if (endpointController is null) throw new Exception("ControllerActionDescriptor не найден для текущего endpoint");
 
-			ErrorDetails errorDetails = new ErrorDetails(exception.GetType().Name, exception.Title, exception.Details);
 
-			await httpResponse.WriteAsync(JsonSerializer.Serialize(errorDetails));
+			TypeInfo controllerType = endpointController.ControllerTypeInfo;
+
+			MethodInfo actionType = endpointController.MethodInfo;
+
+
+			IThrottleAttribute? controllerThrottle = controllerType.GetCustomAttribute<ThrottleWindowAttibute>();
+
+			IThrottleAttribute? actionThrottle = actionType.GetCustomAttribute<ThrottleWindowAttibute>();
+
+			return actionThrottle ?? controllerThrottle;
 		}
 	}
 
 	public static class ThrottleMiddlewareExtension
 	{
-		public static void UseThrottleMiddleware(this IApplicationBuilder app, Dictionary<ThrottleRole, IThrottleOptions> roleLimits)
+		public static void UseThrottleMiddleware(this IApplicationBuilder app)
 		{
-			app.UseMiddleware<ThrottleMiddleware>(roleLimits);
+			app.UseMiddleware<ThrottleMiddleware>();
 		}
 	}
 }

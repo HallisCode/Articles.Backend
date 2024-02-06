@@ -6,23 +6,13 @@ namespace AspNet.SpecifiedServices
 {
 	public class UserReciever : IUserReciever<User>
 	{
-		private string key = "User";
+		public User? User { get; private set; }
 
-		private User? user;
+		private string key = "User";
 
 		public UserReciever(IHttpContextAccessor httpContextAccessor)
 		{
-			user = (User?) httpContextAccessor.HttpContext?.Items[key];
-		}
-
-		public User? Get()
-		{
-			return user;
-		}
-
-		public void Set(User user)
-		{
-			this.user = user;
+			User = (User?)httpContextAccessor.HttpContext?.Items[key];
 		}
 	}
 }

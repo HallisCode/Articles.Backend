@@ -1,7 +1,6 @@
 ﻿namespace AspNet.Throttle.Options
 {
-	public interface IThrottleOptions
-	{
-		public int TokenLimit { get; }
-	}
+    public interface IThrottleOptions
+    {
+    }
 }

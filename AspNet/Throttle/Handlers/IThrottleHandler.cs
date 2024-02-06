@@ -1,9 +1,6 @@
-﻿using AspNet.Throttle.Options;
-
-namespace AspNet.Throttle.Handlers
+﻿namespace AspNet.Throttle.Handlers
 {
-	public interface IThrottleHandler<TOptions> where TOptions : IThrottleOptions
+	public interface IThrottleHandler
 	{
-		public bool Handle(string key, TOptions options);
 	}
 }

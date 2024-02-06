@@ -8,8 +8,6 @@ namespace Application.IServices
 {
 	public interface IUserReciever<TUser>
 	{
-		public TUser? Get();
-
-		public void Set(TUser user);
+		public TUser? User { get; }
 	}
 }

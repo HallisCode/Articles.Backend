@@ -22,7 +22,7 @@ public class AuthorizeAttribute : Attribute, IAuthorizationFilter
 
 		IUserReciever<User>? userReciever = context.HttpContext.RequestServices.GetService<IUserReciever<User>>();
 
-		User? user = userReciever?.Get();
+		User? user = userReciever?.User;
 
 
 		if (user == null)

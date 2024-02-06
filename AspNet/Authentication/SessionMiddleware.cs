@@ -3,6 +3,7 @@ using Application.IServices.Authentication;
 using Domain.Entities.UserScope;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Primitives;
 using System.Threading.Tasks;
 
@@ -17,11 +18,7 @@ namespace AspNet.Authentication
 			this.next = next;
 		}
 
-		public async Task InvokeAsync(
-			HttpContext httpContext,
-			ISessionService<User, string> authenticationService,
-			IUserReciever<User> userReciever
-			)
+		public async Task InvokeAsync(HttpContext httpContext, ISessionService<User, string> authenticationService)
 		{
 			StringValues possibleSessionId;
 
@@ -33,7 +30,7 @@ namespace AspNet.Authentication
 
 				User user = await authenticationService.VerifySession(sessionId);
 
-				userReciever.Set(user);
+				httpContext.Items["User"] = user;
 			}
 
 			await next.Invoke(httpContext);
