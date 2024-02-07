@@ -4,10 +4,15 @@ namespace AspNet.Throttle.Options
 {
 	public class ThrottleWindowOptions : IThrottleOptions
 	{
-		public string Key => throw new NotImplementedException();
+		public int TokenLimit { get; set; }
 
-		public int TokenLimit => throw new NotImplementedException();
+		public TimeSpan TimeInterval { get; set; }
 
-		public TimeSpan TimeInterval => throw new NotImplementedException();
+		public ThrottleWindowOptions(int tokenLimit, double timeIntervalSeconds)
+		{
+			this.TokenLimit = tokenLimit;
+
+			this.TimeInterval = TimeSpan.FromSeconds(timeIntervalSeconds);
+		}
 	}
 }

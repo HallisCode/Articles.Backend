@@ -11,10 +11,18 @@ namespace AspNet.Throttle.Attrubites
 
 		public TimeSpan TimeInterval { get; private set; }
 
+		public ThrottleWindowAttibute(string key, int tokenLimit, double timeIntervalSeconds)
+		{
+			this.Key = key;
+
+			this.TokenLimit = tokenLimit;
+
+			this.TimeInterval = TimeSpan.FromSeconds(timeIntervalSeconds);
+		}
 
 		public ThrottleWindowOptions GetOptions()
 		{
-			return new ThrottleWindowOptions();
+			return new ThrottleWindowOptions(TokenLimit, TimeInterval.Seconds);
 		}
 	}
 }

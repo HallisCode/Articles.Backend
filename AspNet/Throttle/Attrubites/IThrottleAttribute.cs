@@ -4,6 +4,6 @@ namespace AspNet.Throttle.Attrubites
 {
 	public interface IThrottleAttribute<out TOptions> : IThrottleOptions, IGetThrottleOptions<TOptions> where TOptions : IThrottleOptions
 	{
-
+		public string Key { get; }
 	}
 }
