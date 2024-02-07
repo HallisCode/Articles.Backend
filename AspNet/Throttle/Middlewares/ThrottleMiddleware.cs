@@ -1,6 +1,9 @@
-﻿using AspNet.Throttle.Attrubites;
+﻿using Application.IServices;
+using AspNet.Throttle.Attrubites;
+using AspNet.Throttle.Enum;
 using AspNet.Throttle.Handlers;
 using AspNet.Throttle.Options;
+using Domain.Entities.UserScope;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -19,11 +22,9 @@ namespace AspNet.Throttle.Middlewares
 		private readonly IMemoryCache memoryCache;
 
 
-		// Нужно сохранить возможность собирать все IThrottleHandler в одной коллекции.
-		// Дабы на основе typeof(options) получать конкретный обработчик, для конкретного типа настроек.
 		private Dictionary<Type, IThrottleHandler> handlers;
 
-		// private Dictionary<ThrottleGroup, IThrottleOptions> throttleGroupSettings;
+		private Dictionary<ThrottleGroup, IThrottleOptions> throttleGroupSettings;
 
 		private string globalThrottlingKey = "global";
 
@@ -38,27 +39,25 @@ namespace AspNet.Throttle.Middlewares
 
 			handlers[typeof(ThrottleWindowOptions)] = new ThrottleWindowHandler(memoryCache);
 
-			//throttleGroupSettings = new Dictionary<ThrottleGroup, IThrottleOptions>()
-			//{
-			//	{ThrottleGroup.Anonymous, new ThrottleWindowOptions() },
-			//	{ThrottleGroup.Identifier, new ThrottleWindowOptions()}
-			//};
+			throttleGroupSettings = new Dictionary<ThrottleGroup, IThrottleOptions>()
+			{
+				{ThrottleGroup.Anonymous, new ThrottleWindowOptions(1,60) },
+				{ThrottleGroup.Identifier, new ThrottleWindowOptions(1,60)}
+			};
 
 		}
 
-		public async Task InvokeAsync(HttpContext httpContext)
+		public async Task InvokeAsync(HttpContext httpContext, IUserReciever<User> userReciever)
 		{
 			Endpoint? endpoint = httpContext.GetEndpoint();
 
 			if (endpoint is null) await next.Invoke(httpContext);
 
-			string identifier = GetIdentifier(httpContext, out bool isAnonymous);
-			// string identifier = GetIdentifier(httpContext, userReciever, out bool isAnonymous);
+			string identifier = GetIdentifier(httpContext, userReciever, out bool isAnonymous);
 
 			string key = globalThrottlingKey;
 
-			IThrottleOptions options = new ThrottleWindowOptions(1, 60);
-			// IThrottleOptions options = isAnonymous ? throttleGroupSettings[ThrottleGroup.Anonymous] : throttleGroupSettings[ThrottleGroup.Identifier];
+			IThrottleOptions options = isAnonymous ? throttleGroupSettings[ThrottleGroup.Anonymous] : throttleGroupSettings[ThrottleGroup.Identifier];
 
 
 			IThrottleAttribute<IThrottleOptions>? throttleAttribute = GetThrottleAttribute(endpoint);
@@ -69,54 +68,42 @@ namespace AspNet.Throttle.Middlewares
 
 				key = throttleAttribute.Key;
 			}
-			// На основе typeof(options), я собираюсь получать характерный обработчик для данных настроек.
-			// Конкретным обработчикам, нужны будут конкретные options.
+
 			IThrottleHandler? handler = GetHandler(options);
 
 			if (handler is null)
 			{
-				await next.Invoke(httpContext);
+				throw new Exception($"Для {options.GetType()} в {typeof(ThrottleMiddleware)} обработчик не задан.");
 			}
 
-			// TODO: Если true => выбрасываем исключение.
 			bool isThrottle = handler.Throttle(key, options);
 
 
 			await next.Invoke(httpContext);
 		}
 
-		private string GetIdentifier(HttpContext httpContext, out bool isAnonymous)
+		private string GetIdentifier(HttpContext httpContext, IUserReciever<User> userReciever, out bool isAnonymous)
 		{
 			isAnonymous = true;
 
-			string key = httpContext.Request.Host.Host;
+			string key;
 
+
+			User? user = userReciever.User;
+
+			if (user is not null)
+			{
+				isAnonymous = false;
+
+				key = user.Id.ToString();
+			}
+			else
+			{
+				key = httpContext.Request.Host.Host;
+			}
 
 			return key;
 		}
-
-		//private string GetIdentifier(HttpContext httpContext, IUserReciever<User> userReciever, out bool isAnonymous)
-		//{
-		//	isAnonymous = true;
-
-		//	string key;
-
-
-		//	User? user = userReciever.User;
-
-		//	if (user is not null)
-		//	{
-		//		isAnonymous = false;
-
-		//		key = user.Id.ToString();
-		//	}
-		//	else
-		//	{
-		//		key = httpContext.Request.Host.Host;
-		//	}
-
-		//	return key;
-		//}
 
 		private IThrottleHandler? GetHandler(IThrottleOptions options)
 		{
@@ -134,9 +121,7 @@ namespace AspNet.Throttle.Middlewares
 
 			MethodInfo actionType = endpointController.MethodInfo;
 
-			// Пока конкретные настройки я получаю за счёт конкретного аттрибута, а как быть когда аттррибутов IThrottleHandler будет несколько ?
-			// Каким образом я буду получать атрибуты контроллера и метода, которые реализуют IThrottleHandler ?
-			// Если через рефлексию, там она будет просто лютейшая, мне кажется я явно реализую не правильно всю архитектуру Throttle в целом.
+
 			IThrottleAttribute<IThrottleOptions>? controllerThrottle = controllerType.GetCustomAttribute<ThrottleWindowAttibute>();
 
 			IThrottleAttribute<IThrottleOptions>? actionThrottle = actionType.GetCustomAttribute<ThrottleWindowAttibute>();
