@@ -1,11 +1,9 @@
-﻿namespace AspNet.Throttle.Attrubites
+﻿using AspNet.Throttle.Options;
+
+namespace AspNet.Throttle.Attrubites
 {
-	public interface IThrottleAttribute
+	public interface IThrottleAttribute<out TOptions> : IThrottleOptions, IGetThrottleOptions<TOptions> where TOptions : IThrottleOptions
 	{
-		public string Key { get; }
 
-		public int TokenLimit { get; }
-
-		public double WindowPeriod { get; }
 	}
 }

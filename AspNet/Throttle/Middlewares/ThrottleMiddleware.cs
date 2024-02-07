@@ -34,6 +34,13 @@ namespace AspNet.Throttle.Middlewares
 			handlers = new Dictionary<Type, ThrottleDelegate<IThrottleOptions>>();
 
 			handlers[typeof(ThrottleWindowOptions)] = null;
+
+			throttleGroupSettings = new Dictionary<ThrottleGroup, IThrottleOptions>()
+			{
+				{ThrottleGroup.Anonymous, new ThrottleWindowOptions() },
+				{ThrottleGroup.Identifier, new ThrottleWindowOptions()}
+			};
+
 		}
 
 		public async Task InvokeAsync(HttpContext httpContext, IUserReciever<User> userReciever)
@@ -50,13 +57,11 @@ namespace AspNet.Throttle.Middlewares
 			IThrottleOptions options = isAnonymous ? throttleGroupSettings[ThrottleGroup.Anonymous] : throttleGroupSettings[ThrottleGroup.Identifier];
 
 
-			IThrottleAttribute? throttleAttribute = GetThrottleAttribute(endpoint);
+			IThrottleAttribute<IThrottleOptions>? throttleAttribute = GetThrottleAttribute(endpoint);
 
 			if (throttleAttribute is not null)
 			{
-				IGetThrottleOptions<IThrottleOptions>? getterOptions = (IGetThrottleOptions<IThrottleOptions>)throttleAttribute;
-
-				options = getterOptions.GetOptions();
+				options = throttleAttribute.GetOptions();
 
 				key = throttleAttribute.Key;
 			}
@@ -95,7 +100,7 @@ namespace AspNet.Throttle.Middlewares
 			return handlers.GetValueOrDefault(options.GetType());
 		}
 
-		private IThrottleAttribute? GetThrottleAttribute(Endpoint endpoint)
+		private IThrottleAttribute<IThrottleOptions>? GetThrottleAttribute(Endpoint endpoint)
 		{
 			ControllerActionDescriptor? endpointController = endpoint.Metadata.GetMetadata<ControllerActionDescriptor>();
 
@@ -107,9 +112,9 @@ namespace AspNet.Throttle.Middlewares
 			MethodInfo actionType = endpointController.MethodInfo;
 
 
-			IThrottleAttribute? controllerThrottle = controllerType.GetCustomAttribute<ThrottleWindowAttibute>();
+			IThrottleAttribute<IThrottleOptions>? controllerThrottle = controllerType.GetCustomAttribute<ThrottleWindowAttibute>();
 
-			IThrottleAttribute? actionThrottle = actionType.GetCustomAttribute<ThrottleWindowAttibute>();
+			IThrottleAttribute<IThrottleOptions>? actionThrottle = actionType.GetCustomAttribute<ThrottleWindowAttibute>();
 
 			return actionThrottle ?? controllerThrottle;
 		}
