@@ -17,6 +17,7 @@ using AspNet.Authentication;
 using Application.IServices;
 using AspNet.SpecifiedServices;
 using AspNet.Throttle.Middlewares;
+using AspNet.Throttle.Handlers;
 
 namespace WebApi
 {

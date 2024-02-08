@@ -6,10 +6,11 @@ namespace AspNet.Throttle.Handlers
 {
 	public abstract class ThrottleHandlerBase<TOptions> : IThrottleHandler where TOptions : IThrottleOptions
 	{
-		public readonly Type OptionsType = typeof(TOptions);
+		public Type OptionsType { get; private set; } = typeof(TOptions);
 
 
 		protected readonly IMemoryCache memoryCache;
+
 
 		public ThrottleHandlerBase(IMemoryCache memoryCache)
 		{
@@ -23,7 +24,7 @@ namespace AspNet.Throttle.Handlers
 
 			TOptions _options = (TOptions)options;
 
-			bool isExistContext = memoryCache.TryGetValue(key, out LimitingContext? context);
+			bool isExistContext = memoryCache.TryGetValue(key, out IContext? context);
 
 			if (!isExistContext)
 			{
@@ -42,9 +43,9 @@ namespace AspNet.Throttle.Handlers
 			return false;
 		}
 
-		protected abstract void ExecuteThrottleRules(TOptions options, LimitingContext context);
+		protected abstract void ExecuteThrottleRules(TOptions options, IContext context);
 
-		protected abstract LimitingContext SetContext(string key, TOptions options);
+		protected abstract IContext SetContext(string key, TOptions options);
 
 		protected virtual void VerifyOptionsType(object options)
 		{
@@ -55,7 +56,12 @@ namespace AspNet.Throttle.Handlers
 			}
 		}
 
-		protected class LimitingContext
+		protected interface IContext
+		{
+			public int TokensAvailable { get; set; }
+		}
+
+		protected class LimitingContext : IContext
 		{
 			public int TokensAvailable { get; set; }
 

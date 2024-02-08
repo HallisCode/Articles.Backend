@@ -28,7 +28,7 @@ namespace AspNet.Middlewares
 
 				ErrorDetails errorDetails = new ErrorDetails(exception.GetType().Name, exception.Title, exception.Details);
 
-				await httpContext.Response.WriteAsync(JsonSerializer.Serialize(errorDetails));
+				await httpContext.Response.WriteAsJsonAsync(errorDetails);
 
 				return;
 			}

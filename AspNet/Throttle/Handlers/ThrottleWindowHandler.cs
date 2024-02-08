@@ -9,9 +9,9 @@ namespace AspNet.Throttle.Handlers
 		{
 		}
 
-		protected override void ExecuteThrottleRules(ThrottleWindowOptions options, LimitingContext context)
+		protected override void ExecuteThrottleRules(ThrottleWindowOptions options, IContext context)
 		{
-
+			LimitingWindowContext _context = (LimitingWindowContext)context;
 		}
 
 		protected override LimitingWindowContext SetContext(string key, ThrottleWindowOptions options)

@@ -1,15 +1,17 @@
 ﻿using Application.IServices;
+using AspNet.Dto;
 using AspNet.Throttle.Attrubites;
-using AspNet.Throttle.Enum;
 using AspNet.Throttle.Handlers;
 using AspNet.Throttle.Options;
 using Domain.Entities.UserScope;
+using Domain.Exceptions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -22,9 +24,11 @@ namespace AspNet.Throttle.Middlewares
 		private readonly IMemoryCache memoryCache;
 
 
-		private Dictionary<Type, IThrottleHandler> handlers;
+		private IReadOnlyCollection<IThrottleHandler> handlers;
 
-		private Dictionary<ThrottleGroup, IThrottleOptions> throttleGroupSettings;
+		private IThrottleOptions authenticatedPolicy;
+
+		private IThrottleOptions anonymousPolicy;
 
 		private string globalThrottlingKey = "global";
 
@@ -35,15 +39,11 @@ namespace AspNet.Throttle.Middlewares
 
 			this.memoryCache = memoryCache;
 
-			handlers = new Dictionary<Type, IThrottleHandler>();
-
-			handlers[typeof(ThrottleWindowOptions)] = new ThrottleWindowHandler(memoryCache);
-
-			throttleGroupSettings = new Dictionary<ThrottleGroup, IThrottleOptions>()
+			handlers = (new List<IThrottleHandler>(handlers)
 			{
-				{ThrottleGroup.Anonymous, new ThrottleWindowOptions(1,60) },
-				{ThrottleGroup.Identifier, new ThrottleWindowOptions(1,60)}
-			};
+				new ThrottleWindowHandler(memoryCache)
+			}).AsReadOnly();
+
 
 		}
 
@@ -51,13 +51,19 @@ namespace AspNet.Throttle.Middlewares
 		{
 			Endpoint? endpoint = httpContext.GetEndpoint();
 
-			if (endpoint is null) await next.Invoke(httpContext);
+			if (endpoint is null)
+			{
+				await next.Invoke(httpContext);
+
+				return;
+			};
+
 
 			string identifier = GetIdentifier(httpContext, userReciever, out bool isAnonymous);
 
-			string key = globalThrottlingKey;
+			string policyKey = globalThrottlingKey;
 
-			IThrottleOptions options = isAnonymous ? throttleGroupSettings[ThrottleGroup.Anonymous] : throttleGroupSettings[ThrottleGroup.Identifier];
+			IThrottleOptions options = isAnonymous ? anonymousPolicy : authenticatedPolicy;
 
 
 			IThrottleAttribute<IThrottleOptions>? throttleAttribute = GetThrottleAttribute(endpoint);
@@ -66,8 +72,9 @@ namespace AspNet.Throttle.Middlewares
 			{
 				options = throttleAttribute.GetOptions();
 
-				key = throttleAttribute.Key;
+				policyKey = throttleAttribute.Key;
 			}
+
 
 			IThrottleHandler? handler = GetHandler(options);
 
@@ -76,38 +83,47 @@ namespace AspNet.Throttle.Middlewares
 				throw new Exception($"Для {options.GetType()} в {typeof(ThrottleMiddleware)} обработчик не задан.");
 			}
 
+
+			string key = $"{identifier}:{policyKey}";
+
 			bool isThrottle = handler.Throttle(key, options);
 
+			if (isThrottle)
+			{
+				SendError(httpContext, policyKey);
+
+				return;
+			}
 
 			await next.Invoke(httpContext);
 		}
 
+		private void SendError(HttpContext httpContext, string policyKey)
+		{
+			TooManyRequestsException exception = new TooManyRequestsException(
+				"Вы совершаете слишком много запросов.",
+				$"Вам заблокированы все ресурсы, относящиеся к политике {policyKey}"
+				);
+
+			ErrorDetails errorDetails = new ErrorDetails(exception.GetType().Name, exception.Title, exception.Details);
+
+			httpContext.Response.WriteAsJsonAsync(errorDetails);
+		}
+
 		private string GetIdentifier(HttpContext httpContext, IUserReciever<User> userReciever, out bool isAnonymous)
 		{
-			isAnonymous = true;
-
-			string key;
-
-
 			User? user = userReciever.User;
 
-			if (user is not null)
-			{
-				isAnonymous = false;
+			string key = user?.Id.ToString() ?? httpContext.Request.Host.Host;
 
-				key = user.Id.ToString();
-			}
-			else
-			{
-				key = httpContext.Request.Host.Host;
-			}
+			isAnonymous = user is null;
 
 			return key;
 		}
 
 		private IThrottleHandler? GetHandler(IThrottleOptions options)
 		{
-			return handlers.GetValueOrDefault(options.GetType());
+			return handlers.FirstOrDefault(handler => handler.OptionsType == options.GetType());
 		}
 
 		private IThrottleAttribute<IThrottleOptions>? GetThrottleAttribute(Endpoint endpoint)
