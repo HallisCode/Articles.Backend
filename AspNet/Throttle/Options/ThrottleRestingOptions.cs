@@ -2,14 +2,14 @@
 
 namespace AspNet.Throttle.Options
 {
-	public class ThrottleWindowOptions : IThrottleOptions
+	public class ThrottleRestingOptions : IThrottleOptions
 	{
 		public int TokenLimit { get; private set; }
 
 		public TimeSpan TimeInterval { get; private set; }
 
 
-		public ThrottleWindowOptions(int tokenLimit, double timeIntervalSeconds)
+		public ThrottleRestingOptions(int tokenLimit, double timeIntervalSeconds)
 		{
 			this.TokenLimit = tokenLimit;
 

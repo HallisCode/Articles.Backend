@@ -3,15 +3,18 @@ using System;
 
 namespace AspNet.Throttle.Attrubites
 {
-	public class ThrottleWindowAttibute : Attribute, IThrottleAttribute<ThrottleWindowOptions>
+	public class ThrottleRestingAttribute : Attribute, IThrottleAttribute
 	{
+		public Type OptionsType { get; private set; } = typeof(ThrottleRestingOptions);
+
 		public string Key { get; private set; }
 
 		public int TokenLimit { get; private set; }
 
 		public TimeSpan TimeInterval { get; private set; }
 
-		public ThrottleWindowAttibute(string key, int tokenLimit, double timeIntervalSeconds)
+
+		public ThrottleRestingAttribute(string key, int tokenLimit, double timeIntervalSeconds)
 		{
 			this.Key = key;
 
@@ -20,9 +23,9 @@ namespace AspNet.Throttle.Attrubites
 			this.TimeInterval = TimeSpan.FromSeconds(timeIntervalSeconds);
 		}
 
-		public ThrottleWindowOptions GetOptions()
+		public IThrottleOptions GetOptions()
 		{
-			return new ThrottleWindowOptions(TokenLimit, TimeInterval.Seconds);
+			return new ThrottleRestingOptions(TokenLimit, TimeInterval.TotalSeconds);
 		}
 	}
 }

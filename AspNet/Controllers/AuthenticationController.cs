@@ -22,7 +22,7 @@ namespace AspNet.Controllers
 
 		}
 
-		[ThrottleWindowAttibute("login", 1, 5)]
+		[ThrottleResting("login", 8, 60)]
 		[AllowAnonymous]
 		[HttpPost]
 		public async Task<ActionResult<string>> LogIn(LogInRequest logInModel)

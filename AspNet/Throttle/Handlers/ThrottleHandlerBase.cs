@@ -24,6 +24,7 @@ namespace AspNet.Throttle.Handlers
 
 			TOptions _options = (TOptions)options;
 
+
 			bool isExistContext = memoryCache.TryGetValue(key, out IContext? context);
 
 			if (!isExistContext)
@@ -33,7 +34,7 @@ namespace AspNet.Throttle.Handlers
 
 			if (isExistContext && context?.TokensAvailable <= 0)
 			{
-				ExecuteThrottleRules(_options, context);
+				ExecuteThrottleRules(key, _options, context);
 
 				return true;
 			}
@@ -43,7 +44,7 @@ namespace AspNet.Throttle.Handlers
 			return false;
 		}
 
-		protected abstract void ExecuteThrottleRules(TOptions options, IContext context);
+		protected abstract void ExecuteThrottleRules(string key, TOptions options, IContext context);
 
 		protected abstract IContext SetContext(string key, TOptions options);
 
@@ -51,8 +52,8 @@ namespace AspNet.Throttle.Handlers
 		{
 			if (options.GetType() != OptionsType)
 			{
-				throw new Exception($"Для метода {nameof(VerifyOptionsType)} класса {this.GetType().Name} необходим " +
-					$"параметр типа {OptionsType}, а не {options.GetType()}");
+				throw new Exception($"Для метода {nameof(VerifyOptionsType)} класса {this.GetType()} необходим " +
+					$"параметр типа {OptionsType}, а не переданного {options.GetType()}");
 			}
 		}
 

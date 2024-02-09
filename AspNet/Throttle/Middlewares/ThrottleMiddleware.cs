@@ -3,6 +3,7 @@ using AspNet.Dto;
 using AspNet.Throttle.Attrubites;
 using AspNet.Throttle.Handlers;
 using AspNet.Throttle.Options;
+using AutoMapper.Internal;
 using Domain.Entities.UserScope;
 using Domain.Exceptions;
 using Microsoft.AspNetCore.Builder;
@@ -24,13 +25,13 @@ namespace AspNet.Throttle.Middlewares
 		private readonly IMemoryCache memoryCache;
 
 
-		private IReadOnlyCollection<IThrottleHandler> handlers;
+		private readonly IReadOnlyCollection<IThrottleHandler> handlers;
 
-		private IThrottleOptions authenticatedPolicy;
+		private readonly IThrottleOptions authenticatedPolicy;
 
-		private IThrottleOptions anonymousPolicy;
+		private readonly IThrottleOptions anonymousPolicy;
 
-		private string globalThrottlingKey = "global";
+		private readonly string globalThrottlingKey = "global";
 
 
 		public ThrottleMiddleware(RequestDelegate next, IMemoryCache memoryCache)
@@ -39,12 +40,16 @@ namespace AspNet.Throttle.Middlewares
 
 			this.memoryCache = memoryCache;
 
-			handlers = (new List<IThrottleHandler>(handlers)
+			handlers = new List<IThrottleHandler>()
 			{
-				new ThrottleWindowHandler(memoryCache)
-			}).AsReadOnly();
+				new ThrottleWindowHandler(memoryCache),
+				new ThrottleRestingHandler(memoryCache)
 
+			}.AsReadOnly();
 
+			anonymousPolicy = new ThrottleWindowOptions(96, 60);
+
+			authenticatedPolicy = new ThrottleWindowOptions(128, 60);
 		}
 
 		public async Task InvokeAsync(HttpContext httpContext, IUserReciever<User> userReciever)
@@ -66,7 +71,7 @@ namespace AspNet.Throttle.Middlewares
 			IThrottleOptions options = isAnonymous ? anonymousPolicy : authenticatedPolicy;
 
 
-			IThrottleAttribute<IThrottleOptions>? throttleAttribute = GetThrottleAttribute(endpoint);
+			IThrottleAttribute? throttleAttribute = GetThrottleAttribute(endpoint);
 
 			if (throttleAttribute is not null)
 			{
@@ -76,11 +81,16 @@ namespace AspNet.Throttle.Middlewares
 			}
 
 
+			if (options is null)
+			{
+				throw new Exception($"Для {typeof(ThrottleMiddleware)} не удалось определить настройки для выполнения throttle инструкций.");
+			}
+
 			IThrottleHandler? handler = GetHandler(options);
 
 			if (handler is null)
 			{
-				throw new Exception($"Для {options.GetType()} в {typeof(ThrottleMiddleware)} обработчик не задан.");
+				throw new Exception($"В {typeof(ThrottleMiddleware)} для настроек типа {options.GetType()} обработчик не задан.");
 			}
 
 
@@ -126,11 +136,11 @@ namespace AspNet.Throttle.Middlewares
 			return handlers.FirstOrDefault(handler => handler.OptionsType == options.GetType());
 		}
 
-		private IThrottleAttribute<IThrottleOptions>? GetThrottleAttribute(Endpoint endpoint)
+		private IThrottleAttribute? GetThrottleAttribute(Endpoint endpoint)
 		{
 			ControllerActionDescriptor? endpointController = endpoint.Metadata.GetMetadata<ControllerActionDescriptor>();
 
-			if (endpointController is null) throw new Exception("ControllerActionDescriptor не найден для текущего endpoint");
+			if (endpointController is null) throw new Exception($"{typeof(ControllerActionDescriptor)} не найден для текущего endpoint");
 
 
 			TypeInfo controllerType = endpointController.ControllerTypeInfo;
@@ -138,9 +148,13 @@ namespace AspNet.Throttle.Middlewares
 			MethodInfo actionType = endpointController.MethodInfo;
 
 
-			IThrottleAttribute<IThrottleOptions>? controllerThrottle = controllerType.GetCustomAttribute<ThrottleWindowAttibute>();
+			IThrottleAttribute? controllerThrottle = controllerType.GetCustomAttributes(false)
+				.FirstOrDefault(attribute => attribute is IThrottleAttribute)
+				as IThrottleAttribute;
 
-			IThrottleAttribute<IThrottleOptions>? actionThrottle = actionType.GetCustomAttribute<ThrottleWindowAttibute>();
+			IThrottleAttribute? actionThrottle = actionType.GetCustomAttributes(false)
+				.FirstOrDefault(attribute => attribute is IThrottleAttribute)
+				as IThrottleAttribute;
 
 			return actionThrottle ?? controllerThrottle;
 		}

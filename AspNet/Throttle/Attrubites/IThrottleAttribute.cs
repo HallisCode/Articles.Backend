@@ -2,7 +2,7 @@
 
 namespace AspNet.Throttle.Attrubites
 {
-	public interface IThrottleAttribute<out TOptions> : IThrottleOptions, IGetThrottleOptions<TOptions> where TOptions : IThrottleOptions
+	public interface IThrottleAttribute : IThrottleOptions, IGetThrottleOptions
 	{
 		public string Key { get; }
 	}

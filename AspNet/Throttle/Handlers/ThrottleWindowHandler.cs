@@ -9,7 +9,7 @@ namespace AspNet.Throttle.Handlers
 		{
 		}
 
-		protected override void ExecuteThrottleRules(ThrottleWindowOptions options, IContext context)
+		protected override void ExecuteThrottleRules(string key, ThrottleWindowOptions options, IContext context)
 		{
 			LimitingWindowContext _context = (LimitingWindowContext)context;
 		}
@@ -18,7 +18,7 @@ namespace AspNet.Throttle.Handlers
 		{
 			LimitingWindowContext context = new LimitingWindowContext(options.TokenLimit);
 
-			memoryCache.Set(key, options, options.TimeInterval);
+			memoryCache.Set(key, context, options.TimeInterval);
 
 			return context;
 		}
