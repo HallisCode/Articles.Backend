@@ -3,7 +3,6 @@ using AspNet.Authorization.Attrubites;
 using AspNet.Dto.Request;
 using AspNet.Throttle.Attrubites;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Threading.Tasks;
 
 namespace AspNet.Controllers
@@ -22,7 +21,7 @@ namespace AspNet.Controllers
 
 		}
 
-		[ThrottleResting("login", 8, 60)]
+		[ThrottleSlidingWindow("login", 3, 3, 15)]
 		[AllowAnonymous]
 		[HttpPost]
 		public async Task<ActionResult<string>> LogIn(LogInRequest logInModel)

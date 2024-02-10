@@ -11,7 +11,6 @@ namespace AspNet.Throttle.Handlers
 
 		protected readonly IMemoryCache memoryCache;
 
-
 		public ThrottleHandlerBase(IMemoryCache memoryCache)
 		{
 			this.memoryCache = memoryCache;
@@ -56,6 +55,7 @@ namespace AspNet.Throttle.Handlers
 					$"параметр типа {OptionsType}, а не переданного {options.GetType()}");
 			}
 		}
+
 
 		protected interface IContext
 		{

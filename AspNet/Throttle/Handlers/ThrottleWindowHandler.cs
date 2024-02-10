@@ -1,5 +1,6 @@
 ﻿using AspNet.Throttle.Options;
 using Microsoft.Extensions.Caching.Memory;
+using System;
 
 namespace AspNet.Throttle.Handlers
 {
@@ -11,7 +12,6 @@ namespace AspNet.Throttle.Handlers
 
 		protected override void ExecuteThrottleRules(string key, ThrottleWindowOptions options, IContext context)
 		{
-			LimitingWindowContext _context = (LimitingWindowContext)context;
 		}
 
 		protected override LimitingWindowContext SetContext(string key, ThrottleWindowOptions options)
@@ -22,6 +22,7 @@ namespace AspNet.Throttle.Handlers
 
 			return context;
 		}
+
 
 		protected class LimitingWindowContext : LimitingContext
 		{

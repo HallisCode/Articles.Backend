@@ -43,7 +43,8 @@ namespace AspNet.Throttle.Middlewares
 			handlers = new List<IThrottleHandler>()
 			{
 				new ThrottleWindowHandler(memoryCache),
-				new ThrottleRestingHandler(memoryCache)
+				new ThrottleRestingHandler(memoryCache),
+				new ThrottleSlidingWindowHandler(memoryCache)
 
 			}.AsReadOnly();
 

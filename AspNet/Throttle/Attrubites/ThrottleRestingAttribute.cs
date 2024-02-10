@@ -7,6 +7,7 @@ namespace AspNet.Throttle.Attrubites
 	{
 		public Type OptionsType { get; private set; } = typeof(ThrottleRestingOptions);
 
+
 		public string Key { get; private set; }
 
 		public int TokenLimit { get; private set; }
