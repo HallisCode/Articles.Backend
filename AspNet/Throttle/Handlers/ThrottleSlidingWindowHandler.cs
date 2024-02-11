@@ -124,7 +124,6 @@ namespace AspNet.Throttle.Handlers
 			public int[] Segments { get; set; }
 
 
-
 			public ThrottleSlidingWindowContext(int tokenLimit, int segmentsCount) : base(tokenLimit)
 			{
 				this.CreatedAt = DateTime.UtcNow;

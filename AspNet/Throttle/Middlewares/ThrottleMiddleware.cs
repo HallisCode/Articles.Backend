@@ -3,7 +3,6 @@ using AspNet.Dto;
 using AspNet.Throttle.Attrubites;
 using AspNet.Throttle.Handlers;
 using AspNet.Throttle.Options;
-using AutoMapper.Internal;
 using Domain.Entities.UserScope;
 using Domain.Exceptions;
 using Microsoft.AspNetCore.Builder;
@@ -34,23 +33,44 @@ namespace AspNet.Throttle.Middlewares
 		private readonly string globalThrottlingKey = "global";
 
 
-		public ThrottleMiddleware(RequestDelegate next, IMemoryCache memoryCache)
+		public ThrottleMiddleware(
+			RequestDelegate next,
+			IMemoryCache memoryCache,
+			IReadOnlyCollection<Type> handlers,
+			IThrottleOptions anonymousPolicy,
+			IThrottleOptions authenticatedPolicy
+			)
 		{
 			this.next = next;
 
 			this.memoryCache = memoryCache;
 
-			handlers = new List<IThrottleHandler>()
+
+			this.handlers = InitializeHandlers(handlers);
+
+			if (this.handlers.Count == 0) throw new Exception($"Не задан ни один throttle handler для {typeof(ThrottleMiddleware)}");
+
+
+			this.anonymousPolicy = anonymousPolicy;
+
+			this.authenticatedPolicy = authenticatedPolicy;
+		}
+
+		private IReadOnlyCollection<IThrottleHandler> InitializeHandlers(IReadOnlyCollection<Type> handlers)
+		{
+			List<IThrottleHandler> _handlers = new List<IThrottleHandler>();
+
+			foreach (Type handler in handlers)
 			{
-				new ThrottleWindowHandler(memoryCache),
-				new ThrottleRestingHandler(memoryCache),
-				new ThrottleSlidingWindowHandler(memoryCache)
+				if (!handler.IsAssignableTo(typeof(IThrottleHandler)))
+				{
+					throw new Exception($"Класс обработчик {handler} должен реализовывать {typeof(IThrottleHandler)}");
+				}
 
-			}.AsReadOnly();
+				_handlers.Add((IThrottleHandler)Activator.CreateInstance(handler, memoryCache)!);
+			}
 
-			anonymousPolicy = new ThrottleWindowOptions(96, 60);
-
-			authenticatedPolicy = new ThrottleWindowOptions(128, 60);
+			return _handlers.AsReadOnly();
 		}
 
 		public async Task InvokeAsync(HttpContext httpContext, IUserReciever<User> userReciever)
@@ -163,9 +183,14 @@ namespace AspNet.Throttle.Middlewares
 
 	public static class ThrottleMiddlewareExtension
 	{
-		public static void UseThrottleMiddleware(this IApplicationBuilder app)
+		public static void UseThrottleMiddleware(
+			this IApplicationBuilder app,
+			IReadOnlyCollection<Type> handlers,
+			IThrottleOptions anonymousPolicy,
+			IThrottleOptions authenticatedPolicy
+			)
 		{
-			app.UseMiddleware<ThrottleMiddleware>();
+			app.UseMiddleware<ThrottleMiddleware>(handlers, anonymousPolicy, authenticatedPolicy);
 		}
 	}
 }

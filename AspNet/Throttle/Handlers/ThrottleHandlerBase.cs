@@ -47,9 +47,9 @@ namespace AspNet.Throttle.Handlers
 
 		protected abstract IContext SetContext(string key, TOptions options);
 
-		protected virtual void VerifyOptionsType(object options)
+		protected virtual void VerifyOptionsType<T>(T options) where T : IThrottleOptions
 		{
-			if (options.GetType() != OptionsType)
+			if (options.GetType() != typeof(TOptions))
 			{
 				throw new Exception($"Для метода {nameof(VerifyOptionsType)} класса {this.GetType()} необходим " +
 					$"параметр типа {OptionsType}, а не переданного {options.GetType()}");
