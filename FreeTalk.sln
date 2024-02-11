@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNet", "AspNet\AspNet.csproj", "{9A145537-1037-4E31-87D1-8AA101CBDDAE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "REST_API", "AspNet\REST_API.csproj", "{9A145537-1037-4E31-87D1-8AA101CBDDAE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Database", "Database\Database.csproj", "{642D1DC4-BBB7-43A3-AB16-65B0645377F6}"
 EndProject
