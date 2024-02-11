@@ -18,6 +18,9 @@ using Application.IServices;
 using AspNet.SpecifiedServices;
 using AspNet.Throttle.Middlewares;
 using AspNet.Throttle.Handlers;
+using AspNet.Throttle.Options;
+using System.Collections.Generic;
+using System;
 
 namespace WebApi
 {
@@ -89,7 +92,16 @@ namespace WebApi
 
 			app.UseHttpsRedirection();
 
-			app.UseThrottleMiddleware();
+			app.UseThrottleMiddleware(
+				handlers: new List<Type>() 
+				{
+					typeof(ThrottleWindowHandler),
+					typeof(ThrottleRestingHandler),
+					typeof(ThrottleSlidingWindowHandler),
+				},
+				anonymousPolicy: new ThrottleSlidingWindowOptions(96, 16, 64),
+				authenticatedPolicy: new ThrottleSlidingWindowOptions(128, 16, 64)
+				);
 
 			app.UseExceptionMiddleware();
 

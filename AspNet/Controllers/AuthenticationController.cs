@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace AspNet.Controllers
 {
+	[ThrottleResting("authentication", 8, 64)]
 	[Authorize]
 	[ApiController]
 	[Route("api/[controller]/[action]")]
@@ -21,7 +22,6 @@ namespace AspNet.Controllers
 
 		}
 
-		[ThrottleSlidingWindow("login", 3, 3, 15)]
 		[AllowAnonymous]
 		[HttpPost]
 		public async Task<ActionResult<string>> LogIn(LogInRequest logInModel)
