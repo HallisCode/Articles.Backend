@@ -67,6 +67,12 @@ namespace AspNet.Throttle.Middlewares
 					throw new Exception($"Класс обработчик {handler} должен реализовывать {typeof(IThrottleHandler)}");
 				}
 
+				if (handler.GetConstructor(new Type[] { typeof(IMemoryCache) }) is null)
+				{
+					throw new Exception($"Класс обработчик {handler} должен содержать конструктор, " +
+						$"принимающий только 1 аргумент типа {typeof(IMemoryCache)}");
+				}
+
 				_handlers.Add((IThrottleHandler)Activator.CreateInstance(handler, memoryCache)!);
 			}
 

@@ -8,5 +8,6 @@ namespace AspNet.Throttle.Handlers
 		public Type OptionsType { get; }
 
 		public bool Throttle(string key, IThrottleOptions options);
+
 	}
 }
