@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace AspNet.Validation.ModelConfiguration
 {
-    public class ArticleValidator : AbstractValidator<ArticleRequest>
+    public class ArticleValidation : AbstractValidator<ArticleRequest>
     {
-        public ArticleValidator()
+        public ArticleValidation()
         {
             RuleFor(article => article.Title).NotEmpty().MinimumLength(16).MaximumLength(128);
 

@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace AspNet.Validation.ModelConfiguration
 {
-    public class ReviewValidator : AbstractValidator<ReviewRequest>
+    public class ReviewValidation : AbstractValidator<ReviewRequest>
     {
-        public ReviewValidator()
+        public ReviewValidation()
         {
             RuleFor(review => review.ArticleId).NotEmpty();
 
