@@ -8,9 +8,9 @@ namespace Domain.Exceptions
 
 		public string Title { get; protected set; }
 
-		public string? Details { get; protected set; }
+		public object? Details { get; protected set; }
 
-		public HttpErrorBase(string title, string? details = null)
+		public HttpErrorBase(string title, object? details = null)
 			: base()
 		{
 			this.Title = title;

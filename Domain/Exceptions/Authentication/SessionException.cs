@@ -2,7 +2,7 @@
 {
     public class SessionException : HttpErrorBase
     {
-        public SessionException(string title, string? details = null) : base(title, details)
+        public SessionException(string title, object? details = null) : base(title, details)
         {
         }
 

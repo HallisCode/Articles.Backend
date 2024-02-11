@@ -2,7 +2,7 @@
 {
 	public class CredentialDontMatch : HttpErrorBase
 	{
-		public CredentialDontMatch(string title, string? details = null) : base(title, details)
+		public CredentialDontMatch(string title, object? details = null) : base(title, details)
 		{
 		}
 

@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 
 namespace Domain.Exceptions
 {
-	public class TooManyRequestsException : HttpErrorBase
+	public class ValidationException : HttpErrorBase
 	{
-		public TooManyRequestsException(string title, object? details = null) : base(title, details)
+		public ValidationException(string title, object? details = null) : base(title, details)
 		{
 		}
 
 		protected override void Initialize()
 		{
-			StatusCode = 429;
+			this.StatusCode = 400;
 		}
 	}
 }

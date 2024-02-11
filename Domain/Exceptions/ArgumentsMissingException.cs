@@ -2,7 +2,7 @@
 {
 	public class ArgumentsMissingException : HttpErrorBase
 	{
-		public ArgumentsMissingException(string title, string? details = null) : base(title, details)
+		public ArgumentsMissingException(string title, object? details = null) : base(title, details)
 		{
 		}
 

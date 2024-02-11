@@ -2,7 +2,7 @@
 {
 	public class NotFoundException : HttpErrorBase
 	{
-		public NotFoundException(string title, string? details = null) : base(title, details)
+		public NotFoundException(string title, object? details = null) : base(title, details)
 		{
 		}
 

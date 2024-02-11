@@ -3,7 +3,7 @@ namespace Domain.Exceptions.Authorization
 {
 	public class AccessDeniedException : HttpErrorBase
 	{
-		public AccessDeniedException(string title, string? details = null) : base(title, details)
+		public AccessDeniedException(string title, object? details = null) : base(title, details)
 		{
 		}
 

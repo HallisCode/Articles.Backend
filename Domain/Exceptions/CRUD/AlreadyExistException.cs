@@ -2,7 +2,7 @@
 {
 	public class AlreadyExistException : HttpErrorBase
 	{
-		public AlreadyExistException(string title, string? details = null) : base(title, details)
+		public AlreadyExistException(string title, object? details = null) : base(title, details)
 		{
 		}
 
