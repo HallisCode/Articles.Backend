@@ -15,7 +15,8 @@ namespace Database.EntityConfigurations.UserScope
 
 			builder.Property(user => user.Bio).HasMaxLength(256).IsRequired(false);
 
-			builder.Property(user => user.Role).HasDefaultValue(UserRole.User);
+			builder.Property(user => user.Role).HasDefaultValue(UserRole.User).HasConversion<string>();
+
 
 		}
 	}

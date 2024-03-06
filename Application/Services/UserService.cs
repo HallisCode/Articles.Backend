@@ -9,9 +9,11 @@ namespace Application.Services
 	{
 		private readonly UserRepository userRepository;
 
+
 		public UserService(UserRepository userRepository)
 		{
 			this.userRepository = userRepository;
+
 		}
 
 		/// <summary>
@@ -23,7 +25,7 @@ namespace Application.Services
 		{
 			User? user = await userRepository.TryGetByAsync(id);
 
-			if (user is null) throw new NotFoundException("User with this id isn't found");
+			if (user is null) throw new NotFoundException("Пользователь с таким id не найден");
 
 			return user;
 
@@ -38,9 +40,10 @@ namespace Application.Services
 		{
 			User? user = await userRepository.TryGetByAsync(nikcname);
 
-			if (user is null) throw new NotFoundException("User with this nickname isn't found");
+			if (user is null) throw new NotFoundException("Пользователь с таким никнеймом не найден");
 
 			return user;
 		}
+
 	}
 }

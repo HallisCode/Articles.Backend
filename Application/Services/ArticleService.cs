@@ -135,7 +135,7 @@ namespace Application.Services
 		/// Верификация того, яваляется ли пользователь автором article
 		/// </summary>
 		/// <exception cref="AccessDeniedException"></exception>
-		private void VerifyIsArticleOwner (User user, Article article)
+		private void VerifyIsArticleOwner(User user, Article article)
 		{
 			if (article.AuthorId != user.Id)
 			{

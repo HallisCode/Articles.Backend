@@ -9,15 +9,15 @@ namespace WebApi.Mapping
 	{
 		public MapperProfile()
 		{
-			CreateMap<Article, ArticleResponse>().ReverseMap();
+			CreateMap<Article, ArticleResponse>();
 
-			CreateMap<User, UserResponse>().ReverseMap();
+			CreateMap<User, UserResponse>();
 
-			CreateMap<Tag, TagResponse>().ReverseMap();
+			CreateMap<Tag, TagResponse>();
 
-			CreateMap<Review, ReviewResponse>().ReverseMap();
+			CreateMap<Review, ReviewResponse>();
 
-			CreateMap<ReviewComment, ReviewCommentResponse>().ReverseMap();
+			CreateMap<ReviewComment, ReviewCommentResponse>();
 		}
 	}
 }

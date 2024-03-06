@@ -2,7 +2,6 @@
 using Domain.Exceptions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace AspNet.Middlewares

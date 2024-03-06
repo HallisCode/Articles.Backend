@@ -1,5 +1,5 @@
-﻿using Application.IServices.Registry;
-using AspNet.Authorization.Attrubites;
+﻿using API.Authentication.Attrubites;
+using Application.IServices.Registry;
 using AspNet.Dto.Request;
 using AspNet.Throttle.Attrubites;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace AspNet.Controllers
 {
 	[ThrottleResting("registry", 4, 256)]
-	[Authorize]
+	[AuthenticationNecessary]
 	[ApiController]
 	[Route("api/[controller]/[action]")]
 	public sealed class RegistryController : ControllerBase

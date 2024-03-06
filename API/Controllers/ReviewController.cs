@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace AspNet.Controllers
 {
-	[Authorize]
+	[AuthenticationNecessary]
 	[ApiController]
 	[Route("api/[controller]/[action]")]
 	public sealed class ReviewController : ControllerBase

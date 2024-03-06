@@ -21,8 +21,6 @@ namespace Domain.Entities.UserScope
 
 		public UserSecurity UserSecurity { get; set; }
 
-		public ICollection<UserSession> UserSessions { get; set; }
-
 		public ICollection<Article> Articles { get; set; }
 
 		#endregion

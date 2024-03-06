@@ -1,5 +1,4 @@
-﻿using Application.IServices;
-using AspNet.Dto;
+﻿using API.Options;
 using AspNet.Throttle.Attrubites;
 using AspNet.Throttle.Handlers;
 using AspNet.Throttle.Options;
@@ -9,6 +8,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -56,6 +56,12 @@ namespace AspNet.Throttle.Middlewares
 			this.authenticatedPolicy = authenticatedPolicy;
 		}
 
+		/// <summary>
+		/// Добавляет все переданные обработчики, проверя их на соответствие сигнатуре.
+		/// </summary>
+		/// <param name="handlers">Заданные обработчики.</param>
+		/// <returns></returns>
+		/// <exception cref="Exception"></exception>
 		private IReadOnlyCollection<IThrottleHandler> InitializeHandlers(IReadOnlyCollection<Type> handlers)
 		{
 			List<IThrottleHandler> _handlers = new List<IThrottleHandler>();
@@ -79,7 +85,7 @@ namespace AspNet.Throttle.Middlewares
 			return _handlers.AsReadOnly();
 		}
 
-		public async Task InvokeAsync(HttpContext httpContext, IUserReciever<User> userReciever)
+		public async Task InvokeAsync(HttpContext httpContext, IOptions<DataKeysOptions> dataKeys)
 		{
 			Endpoint? endpoint = httpContext.GetEndpoint();
 
@@ -90,13 +96,17 @@ namespace AspNet.Throttle.Middlewares
 				return;
 			};
 
-
-			string identifier = GetIdentifier(httpContext, userReciever, out bool isAnonymous);
-
 			string policyKey = globalThrottlingKey;
+
+
+			// Задаем общие throttle настройки в зависимости от того, аутентифицирован пользователь или нет
+
+			string identifier = GetIdentifier(httpContext, dataKeys, out bool isAnonymous);
 
 			IThrottleOptions options = isAnonymous ? anonymousPolicy : authenticatedPolicy;
 
+
+			// Меняем throttle настройки, если таковые установлены на ендпоинте
 
 			IThrottleAttribute? throttleAttribute = GetThrottleAttribute(endpoint);
 
@@ -120,6 +130,7 @@ namespace AspNet.Throttle.Middlewares
 				throw new Exception($"В {typeof(ThrottleMiddleware)} для настроек типа {options.GetType()} обработчик не задан.");
 			}
 
+			// Запускаем выполнение обработчика
 
 			string key = $"{identifier}:{policyKey}";
 
@@ -127,29 +138,22 @@ namespace AspNet.Throttle.Middlewares
 
 			if (isThrottle)
 			{
-				SendError(httpContext, policyKey);
-
-				return;
+				throw new TooManyRequestsException(
+					"Вы совершаете слишком много запросов.",
+					$"Вам заблокированы все ресурсы, относящиеся к политике {policyKey}"
+				);
 			}
 
 			await next.Invoke(httpContext);
 		}
 
-		private void SendError(HttpContext httpContext, string policyKey)
+		/// <summary>
+		/// Возвращает идентификатор пользователя сделавшего запрос.
+		/// </summary>
+		/// <returns>Идентификатор пользователя</returns>
+		private string GetIdentifier(HttpContext httpContext, IOptions<DataKeysOptions> dataKeys, out bool isAnonymous)
 		{
-			TooManyRequestsException exception = new TooManyRequestsException(
-				"Вы совершаете слишком много запросов.",
-				$"Вам заблокированы все ресурсы, относящиеся к политике {policyKey}"
-				);
-
-			ErrorDetails errorDetails = new ErrorDetails(exception.GetType().Name, exception.Title, exception.Details);
-
-			httpContext.Response.WriteAsJsonAsync(errorDetails);
-		}
-
-		private string GetIdentifier(HttpContext httpContext, IUserReciever<User> userReciever, out bool isAnonymous)
-		{
-			User? user = userReciever.User;
+			User? user = (User?)httpContext.Items[dataKeys.Value.User];
 
 			string key = user?.Id.ToString() ?? httpContext.Request.Host.Host;
 
@@ -158,11 +162,21 @@ namespace AspNet.Throttle.Middlewares
 			return key;
 		}
 
+
+		/// <summary>
+		/// Возвращает обработчик в зависимости от типа throttleOptions.
+		/// </summary>
+		/// <returns>Throttle обработчик</returns>
 		private IThrottleHandler? GetHandler(IThrottleOptions options)
 		{
 			return handlers.FirstOrDefault(handler => handler.OptionsType == options.GetType());
 		}
 
+		/// <summary>
+		/// Возвращает аттрибут ендпоинта, который содержит throttle настройки.
+		/// </summary>
+		/// <returns>Throttle аттрибут</returns>
+		/// <exception cref="Exception"></exception>
 		private IThrottleAttribute? GetThrottleAttribute(Endpoint endpoint)
 		{
 			ControllerActionDescriptor? endpointController = endpoint.Metadata.GetMetadata<ControllerActionDescriptor>();
@@ -175,11 +189,11 @@ namespace AspNet.Throttle.Middlewares
 			MethodInfo actionType = endpointController.MethodInfo;
 
 
-			IThrottleAttribute? controllerThrottle = controllerType.GetCustomAttributes(false)
+			IThrottleAttribute? actionThrottle = actionType.GetCustomAttributes(false)
 				.FirstOrDefault(attribute => attribute is IThrottleAttribute)
 				as IThrottleAttribute;
 
-			IThrottleAttribute? actionThrottle = actionType.GetCustomAttributes(false)
+			IThrottleAttribute? controllerThrottle = controllerType.GetCustomAttributes(false)
 				.FirstOrDefault(attribute => attribute is IThrottleAttribute)
 				as IThrottleAttribute;
 
