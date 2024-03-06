@@ -1,4 +1,5 @@
 ﻿using API.Authentication.Attrubites;
+using API.Options;
 using Application.Services;
 using AspNet.Dto.Request;
 using AspNet.Dto.Response;
@@ -6,6 +7,7 @@ using AutoMapper;
 using Domain.Entities.ArticleScope;
 using Domain.Entities.UserScope;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -20,14 +22,16 @@ namespace WebApi.Controllers
 
 		private readonly IMapper mapper;
 
+		private readonly IOptions<DataKeysOptions> dataKeys;
 
-		public ArticleController(
-			ArticleService articleService,
-			IMapper mapper)
+
+		public ArticleController(ArticleService articleService, IOptions<DataKeysOptions> dataKeys, IMapper mapper)
 		{
 			this.articleService = articleService;
 
 			this.mapper = mapper;
+
+			this.dataKeys = dataKeys;
 		}
 
 		[AllowAnonymous]
@@ -61,7 +65,7 @@ namespace WebApi.Controllers
 		public async Task<ActionResult<ArticleResponse>> CreateAsync([FromBody] ArticleRequest articleRequest)
 		{
 			Article article = await articleService.CreateAsync(
-				user: (User)HttpContext.Items["User"]!,
+				user: (User)HttpContext.Items[dataKeys.Value.User]!,
 				title: articleRequest.Title,
 				content: articleRequest.Content,
 				tagsId: articleRequest.Tags
@@ -74,7 +78,7 @@ namespace WebApi.Controllers
 		public async Task<ActionResult> UpdateAsync(long id, [FromBody] ArticleRequest articleRequest)
 		{
 			await articleService.UpdateAsync(
-				user: (User)HttpContext.Items["User"]!,
+				user: (User)HttpContext.Items[dataKeys.Value.User]!,
 				id: id,
 				title: articleRequest.Title,
 				content: articleRequest.Content,
@@ -88,7 +92,7 @@ namespace WebApi.Controllers
 		public async Task<ActionResult> DeleteAsync(long id)
 		{
 			await articleService.DeleteAsync(
-				user: (User)HttpContext.Items["User"]!,
+				user: (User)HttpContext.Items[dataKeys.Value.User]!,
 				id: id
 				);
 

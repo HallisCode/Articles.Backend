@@ -33,7 +33,7 @@ namespace Application.Services
 		{
 			Article? article = await articleRepository.TryGetByAsync(id);
 
-			if (article is null) throw new NotFoundException("Article is not found");
+			if (article is null) throw new NotFoundException($"Статья с id - {id} не найдена.");
 
 			return article;
 		}
@@ -47,7 +47,7 @@ namespace Application.Services
 		{
 			List<Article>? articles = await articleRepository.TryGetByAsync(title);
 
-			if (articles is null) throw new NotFoundException("Article is not found");
+			if (articles is null) throw new NotFoundException("Ни одна статья с указанным заголовком не была найдена.");
 
 			return articles;
 		}
@@ -61,12 +61,12 @@ namespace Application.Services
 		{
 			List<Tag>? tags = await tagRepository.TryGetByAsync(tagsId);
 
-			if (tags is null) throw new NotFoundException("No one tag isn't found");
+			if (tags is null) throw new NotFoundException("Ни один указанный тег не был найден.");
 
 
 			List<Article>? articles = await articleRepository.TryGetByAsync(tags);
 
-			if (articles is null) throw new NotFoundException("Articles is not found");
+			if (articles is null) throw new NotFoundException("Ни одна статья с указанными тегами не была найдена.");
 
 			return articles;
 		}
@@ -81,12 +81,12 @@ namespace Application.Services
 		{
 			Article? article = (await articleRepository.TryGetByAsync(title))?.FirstOrDefault();
 
-			if (article is not null) throw new AlreadyExistException("Article with the same title is already exist");
+			if (article is not null) throw new AlreadyExistException("Статья с указанным заголовком уже существует.");
 
 
 			List<Tag>? tags = await tagRepository.TryGetByAsync(tagsId);
 
-			if (tags is null) throw new NotFoundException("No one tag isn't found");
+			if (tags is null) throw new NotFoundException("Ни один указанный тег не был найден.");
 
 
 			tags = tags.Distinct().ToList();
@@ -104,7 +104,7 @@ namespace Application.Services
 		{
 			Article? article = await articleRepository.TryGetByAsync(id);
 
-			if (article is null) throw new NotFoundException("Article with this id isn't found");
+			if (article is null) throw new NotFoundException($"Статья с id - {id} не найдена.");
 
 			VerifyIsArticleOwner(user, article);
 
@@ -123,7 +123,7 @@ namespace Application.Services
 		{
 			Article? article = await articleRepository.TryGetByAsync(id);
 
-			if (article is null) throw new NotFoundException("Article isn't found");
+			if (article is null) throw new NotFoundException($"Статья с id - {id} не найдена.");
 
 			VerifyIsArticleOwner(user, article);
 
@@ -139,7 +139,10 @@ namespace Application.Services
 		{
 			if (article.AuthorId != user.Id)
 			{
-				throw new AccessDeniedException("You aren't author of this artticle");
+				throw new AccessDeniedException(
+					"Вы не имеете права удалить данную статью.",
+					"Вы не являетесь автором данной стать."
+				);
 			}
 		}
 
