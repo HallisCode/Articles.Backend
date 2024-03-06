@@ -1,5 +1,5 @@
-﻿using Domain.Exceptions;
-using AspNet.Dto;
+﻿using AspNet.Dto;
+using Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Results;

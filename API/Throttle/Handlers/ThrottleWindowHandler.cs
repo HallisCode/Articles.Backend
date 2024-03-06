@@ -1,6 +1,5 @@
 ﻿using AspNet.Throttle.Options;
 using Microsoft.Extensions.Caching.Memory;
-using System;
 
 namespace AspNet.Throttle.Handlers
 {

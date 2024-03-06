@@ -2,9 +2,7 @@
 using Domain.Enum;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Database.Repositories
@@ -54,7 +52,7 @@ namespace Database.Repositories
 			return review;
 		}
 
-		public async Task<Review> UpdateAsync(Review review, string? content = null, ReviewType? type = null )
+		public async Task<Review> UpdateAsync(Review review, string? content = null, ReviewType? type = null)
 		{
 			if (content is not null) review.Content = content;
 

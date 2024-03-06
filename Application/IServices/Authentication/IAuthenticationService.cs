@@ -12,13 +12,13 @@ namespace Application.IServices.Authentication
 	public interface IAuthenticationService<TToken, TLoginResult>
 	{
 		/// <summary>
-		/// Обрабатываем запрос пользователя на аутентификацию.
+		/// Обрабатывает запрос пользователя на аутентификацию.
 		/// </summary>
 		/// <returns></returns>
 		public Task<TLoginResult> LogInAsync(string email, string password);
 
 		/// <summary>
-		/// Производим выход из сесии.
+		/// Производит выход из сесии.
 		/// </summary>
 		/// <returns></returns>
 		public Task LogOutAsync(TToken token);

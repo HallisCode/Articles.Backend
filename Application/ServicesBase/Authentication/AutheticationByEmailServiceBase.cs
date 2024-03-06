@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace Application.ServicesBase.Authentication
 {
 	/// <summary>
-	/// Сервис для подтверждения входа на почту через 2FA.
+	/// Сервис для подтверждения входа на аккаунт через 2FA.
 	/// </summary>
 	/// <typeparam name="TToken">Тип данных идентифицирующих пользователя.</typeparam>
 	/// <typeparam name="TRequest">Представление токена, для подтверждения запросов</typeparam>

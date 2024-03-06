@@ -1,14 +1,16 @@
-﻿using Application.IServices.Authentication;
-using AspNet.Authorization.Attrubites;
+﻿using API.Authentication.Attrubites;
+using Application.IServices.Authentication;
+using Application.Services;
 using AspNet.Dto.Request;
 using AspNet.Throttle.Attrubites;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
 namespace AspNet.Controllers
 {
 	[ThrottleResting("authentication", 8, 64)]
-	[Authorize]
+	[AuthenticationNecessary]
 	[ApiController]
 	[Route("api/[controller]/[action]")]
 	public sealed class AuthenticationController : ControllerBase
@@ -16,7 +18,11 @@ namespace AspNet.Controllers
 		private readonly IAuthenticationService<string, string> authenticationService;
 
 
-		public AuthenticationController(IAuthenticationService<string, string> authenticationService)
+		public AuthenticationController(
+			IAuthenticationService<string, string> authenticationService,
+			UserService userService,
+			IMapper mapper
+			)
 		{
 			this.authenticationService = authenticationService;
 
@@ -26,12 +32,12 @@ namespace AspNet.Controllers
 		[HttpPost]
 		public async Task<ActionResult<string>> LogIn(LogInRequest logInModel)
 		{
-			string sessionId = await authenticationService.LogInAsync(
+			string token = await authenticationService.LogInAsync(
 				logInModel.Email,
 				logInModel.Password
 				);
 
-			return sessionId;
+			return token;
 		}
 
 		[HttpPost]

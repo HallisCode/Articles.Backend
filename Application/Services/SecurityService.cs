@@ -13,30 +13,27 @@ namespace Application.Services
 	{
 		private readonly UserSecurityRepository userSecurityRepository;
 
-		private readonly UserSessionRepository userSessionRepository;
-
 		private readonly TimeSpan lifeSpanToken = new TimeSpan(0, 5, 0);
 
 
-		public SecurityService(UserSecurityRepository userSecurityRepository, UserSessionRepository userSessionRepository)
+		public SecurityService(UserSecurityRepository userSecurityRepository)
 		{
 			this.userSecurityRepository = userSecurityRepository;
 
-			this.userSessionRepository = userSessionRepository;
 		}
 
 		/// <summary>
 		/// Меняем пароль установленному пользователю
 		/// </summary>
 		/// <returns></returns>
-		/// <exception cref="CredentialDontMatch"></exception>
+		/// <exception cref="CredentialDontMatchException"></exception>
 		public override async Task ChangePasswordAsync(long userId, string oldPassword, string newPassword)
 		{
 			using (SHA256 sha256 = SHA256.Create())
 			{
-				oldPassword = SHA256Utils.Encrypt(oldPassword, sha256);
+				oldPassword = SHA256Utils.EncryptToString(oldPassword, sha256);
 
-				newPassword = SHA256Utils.Encrypt(newPassword, sha256);
+				newPassword = SHA256Utils.EncryptToString(newPassword, sha256);
 			}
 
 			UserSecurity userSecurity = (await userSecurityRepository.TryGetByAsync(userId))!;
@@ -44,12 +41,10 @@ namespace Application.Services
 			if (userSecurity.Password == oldPassword)
 			{
 				await userSecurityRepository.UpdateAsync(userSecurity, null, newPassword);
-
-				await userSessionRepository.DeleteAsync(userId);
 			}
 			else
 			{
-				throw new CredentialDontMatch("Old password isn't correct");
+				throw new CredentialDontMatchException("Old password isn't correct");
 			}
 		}
 
@@ -58,7 +53,7 @@ namespace Application.Services
 		{
 			using (SHA256 sha256 = SHA256.Create())
 			{
-				newEmail = SHA256Utils.Encrypt(newEmail.ToLower(), sha256);
+				newEmail = SHA256Utils.EncryptToString(newEmail.ToLower(), sha256);
 			}
 
 			UserSecurity userSecurity = (await userSecurityRepository.TryGetByAsync(userId))!;

@@ -32,9 +32,9 @@ namespace Application.Services
 		{
 			using (SHA256 sha256 = SHA256.Create())
 			{
-				email = SHA256Utils.Encrypt(email.ToLower(), sha256);
+				email = SHA256Utils.EncryptToString(email.ToLower(), sha256);
 
-				password = SHA256Utils.Encrypt(password, sha256);
+				password = SHA256Utils.EncryptToString(password, sha256);
 			}
 
 			User? user;

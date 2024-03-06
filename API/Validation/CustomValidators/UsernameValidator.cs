@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using System;
 using System.Text.RegularExpressions;
 
 namespace AspNet.Validation.CustomValidators

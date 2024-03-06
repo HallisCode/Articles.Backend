@@ -1,8 +1,7 @@
-﻿using Application.Services;
-using AspNet.Authorization.Attrubites;
+﻿using API.Authentication.Attrubites;
+using Application.Services;
 using AspNet.Dto.Request;
 using AspNet.Dto.Response;
-using AspNet.Throttle.Attrubites;
 using AutoMapper;
 using Domain.Entities.ArticleScope;
 using Domain.Entities.UserScope;
@@ -12,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace WebApi.Controllers
 {
-	[Authorize]
+	[AuthenticationNecessary]
 	[ApiController]
 	[Route("api/[controller]/[action]")]
 	public sealed class ArticleController : ControllerBase

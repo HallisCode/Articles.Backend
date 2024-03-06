@@ -14,8 +14,6 @@ namespace Database
 		public DbSet<Tag> Tags { get; set; }
 		public DbSet<User> Users { get; set; }
 		public DbSet<UserSecurity> UserSecurity { get; set; }
-		public DbSet<UserSession> UserSessions { get; set; }
-
 
 		public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
 		{
@@ -40,8 +38,6 @@ namespace Database
 			modelBuilder.ApplyConfiguration(new TagConfiguration());
 
 			modelBuilder.ApplyConfiguration(new UserConfiguration());
-
-			modelBuilder.ApplyConfiguration(new UserSessionConfiguration());
 		}
 
 		protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)

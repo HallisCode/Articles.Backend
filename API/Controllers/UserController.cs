@@ -1,5 +1,5 @@
-﻿using Application.Services;
-using AspNet.Authorization.Attrubites;
+﻿using API.Authentication.Attrubites;
+using Application.Services;
 using AspNet.Dto.Response;
 using AutoMapper;
 using Domain.Entities.UserScope;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace AspNet.Controllers
 {
-	[Authorize]
+	[AuthenticationNecessary]
 	[ApiController]
 	[Route("api/[controller]/[action]")]
 	public sealed class UserController : ControllerBase
