@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 
 namespace WebApi.Controllers
 {
-	[AuthenticationNecessary]
 	[ApiController]
 	[Route("api/[controller]/[action]")]
 	public sealed class ArticleController : ControllerBase

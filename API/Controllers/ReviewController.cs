@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 
 namespace AspNet.Controllers
 {
-	[AuthenticationNecessary]
 	[ApiController]
 	[Route("api/[controller]/[action]")]
 	public sealed class ReviewController : ControllerBase

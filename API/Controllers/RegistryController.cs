@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 namespace AspNet.Controllers
 {
 	[ThrottleResting("registry", 4, 256)]
-	[AuthenticationNecessary]
 	[ApiController]
 	[Route("api/[controller]/[action]")]
 	public sealed class RegistryController : ControllerBase

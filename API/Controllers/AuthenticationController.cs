@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 namespace AspNet.Controllers
 {
 	[ThrottleResting("authentication", 8, 64)]
-	[AuthenticationNecessary]
 	[ApiController]
 	[Route("api/[controller]/[action]")]
 	public sealed class AuthenticationController : ControllerBase
