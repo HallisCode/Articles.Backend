@@ -104,8 +104,7 @@ namespace WebApi
 
 			app.UseExceptionMiddleware();
 
-			app.UseAuthValidatorMiddleware();
-			app.UseVerifyNecessaryAuthMiddleware();
+			app.UseAuthenticationMiddleware();
 
 			app.UseThrottleMiddleware(
 				handlers: new List<Type>()

@@ -1,31 +1,61 @@
-﻿using API.Authentication.Attrubites;
-using API.Options;
+﻿using API.Options;
+using Application.IServices.Authentication;
 using Domain.Entities.UserScope;
-using Domain.Exceptions.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.Extensions.Options;
-using System;
+using Microsoft.Extensions.Primitives;
 using System.Reflection;
+using System;
 using System.Threading.Tasks;
+using Domain.Exceptions.Authorization;
+using API.Authentication.Attrubites;
 
 namespace API.Authentication.Middlewares
 {
-	public class VerifyNecessaryAuthMiddleware
+	public enum AccessMode
+	{
+		Strong,
+		Soft
+	}
+
+	public class AuthenticationMiddleware
 	{
 		private readonly RequestDelegate next;
 
-		public VerifyNecessaryAuthMiddleware(RequestDelegate next)
+		private readonly AccessMode mode;
+
+
+		public AuthenticationMiddleware(RequestDelegate next, AccessMode mode)
 		{
 			this.next = next;
+
+			this.mode = mode;
 		}
 
-		public async Task InvokeAsync(HttpContext httpContext, IOptions<DataKeysOptions> dataKeys)
+		public async Task InvokeAsync(HttpContext httpContext, IOptions<DataKeysOptions> dataKeys, IJWTAuthService<User, string> jWTAuthService)
 		{
-			// Проверяем условия, нужно ли быть аутентифицированным пользователем или нет
-
 			Endpoint? endpoint = httpContext.GetEndpoint();
+
+			User? user = null;
+
+
+			// В случае присутствия в запросе jwt-token - валидируем его
+
+			StringValues possibleJWTToken;
+
+			bool isHasJWTToken = httpContext.Request.Headers.TryGetValue(dataKeys.Value.JWTToken, out possibleJWTToken);
+
+			if (isHasJWTToken)
+			{
+				string jwtToken = possibleJWTToken[0]!;
+
+				user = await jWTAuthService.VerifyJWTTokenAsync(jwtToken);
+
+				httpContext.Items[dataKeys.Value.User] = user;
+			}
+
 
 			if (endpoint is null)
 			{
@@ -35,17 +65,9 @@ namespace API.Authentication.Middlewares
 			};
 
 
+			// Проверяем при необходимости, аутентифицирован пользователь или нет.
+
 			bool isNecessaryAuth = CheckNecessaryAuthentication(endpoint);
-
-			if (!isNecessaryAuth)
-			{
-				await next.Invoke(httpContext);
-
-				return;
-			}
-
-
-			User? user = (User?)httpContext.Items[dataKeys.Value.User];
 
 			if (isNecessaryAuth && user is null)
 			{
@@ -80,15 +102,27 @@ namespace API.Authentication.Middlewares
 				is null ? false : true;
 
 
-			return isAllowAnonymous ? false : (isActionRequire || isControllerRequire);
+			switch (mode)
+			{
+				case (AccessMode.Soft):
+
+					return isAllowAnonymous ? false : (isActionRequire || isControllerRequire);
+
+				case (AccessMode.Strong):
+
+					return !isAllowAnonymous;
+			}
+
+			return false;
 		}
+
 	}
 
-	public static class VerifyNecessaryAuthMiddlewareExtension
+	public static class AuthenticationMiddlewareExtension
 	{
-		public static void UseVerifyNecessaryAuthMiddleware(this IApplicationBuilder app)
+		public static void UseAuthenticationMiddleware(this IApplicationBuilder app, AccessMode mode = AccessMode.Strong)
 		{
-			app.UseMiddleware<VerifyNecessaryAuthMiddleware>();
+			app.UseMiddleware<AuthenticationMiddleware>(mode);
 		}
 	}
 }
