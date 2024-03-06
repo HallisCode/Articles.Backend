@@ -89,15 +89,6 @@ namespace AspNet.Throttle.Middlewares
 		{
 			Endpoint? endpoint = httpContext.GetEndpoint();
 
-			if (endpoint is null)
-			{
-				await next.Invoke(httpContext);
-
-				return;
-			};
-
-			string policyKey = globalThrottlingKey;
-
 
 			// Задаем общие throttle настройки в зависимости от того, аутентифицирован пользователь или нет
 
@@ -105,10 +96,17 @@ namespace AspNet.Throttle.Middlewares
 
 			IThrottleOptions options = isAnonymous ? anonymousPolicy : authenticatedPolicy;
 
+			string policyKey = globalThrottlingKey;
+
+
+			IThrottleAttribute? throttleAttribute = null;
+
+			if (endpoint is not null)
+			{
+				throttleAttribute = GetThrottleAttribute(endpoint);
+			}
 
 			// Меняем throttle настройки, если таковые установлены на ендпоинте
-
-			IThrottleAttribute? throttleAttribute = GetThrottleAttribute(endpoint);
 
 			if (throttleAttribute is not null)
 			{
