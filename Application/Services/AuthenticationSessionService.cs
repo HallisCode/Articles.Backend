@@ -21,13 +21,10 @@ namespace Application.Services
 		private readonly UserSessionRepository userSessionRepository;
 
 
-		private readonly IOptions<SessionConfig> sessionConfig;
-
 		public AuthenticationSessionService(
 			UserSecurityRepository userSecurityRepository,
 			UserRepository userRepository,
-			UserSessionRepository userSessionRepository,
-			IOptions<SessionConfig> sessionConfig
+			UserSessionRepository userSessionRepository
 		)
 		{
 			this.userSecurityRepository = userSecurityRepository;
@@ -36,7 +33,6 @@ namespace Application.Services
 
 			this.userSessionRepository = userSessionRepository;
 
-			this.sessionConfig = sessionConfig;
 		}
 
 		/// <summary>

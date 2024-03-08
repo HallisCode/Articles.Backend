@@ -4,6 +4,8 @@ using Application.IServices.Authentication;
 using Application.IServices.Registry;
 using Application.IServices.Security;
 using Application.Options;
+using Application.Scheduler;
+using Application.Scheduler.Jobs;
 using Application.Services;
 using AspNet.Middlewares;
 using AspNet.Throttle.Handlers;
@@ -19,13 +21,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Quartz;
+using Quartz.AspNetCore;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using System;
 using System.Collections.Generic;
 
 namespace WebApi
 {
-	public class Program
+    public class Program
 	{
 		public static void Main(string[] args)
 		{
@@ -44,7 +47,17 @@ namespace WebApi
 
 
 			// Добавление планировщика задач
-			builder.Services.AddScheduledTasks();
+			builder.Services.AddQuartz(scheduler =>
+			{
+				scheduler.AddJob<SessionCleaner>(config => config.WithIdentity(nameof(SessionCleaner)));
+
+				scheduler.AddTrigger(config =>
+					config.ForJob(nameof(SessionCleaner))
+					.WithSimpleSchedule(options => options.WithIntervalInHours(24).RepeatForever())
+				);
+
+			});
+			builder.Services.AddQuartzServer();
 
 			// Библиотека EntityFrameworkCore
 			builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectPostresql), ServiceLifetime.Scoped);
