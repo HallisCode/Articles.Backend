@@ -51,7 +51,7 @@ namespace AspNet.Throttle.Handlers
 		{
 			if (options.GetType() != typeof(TOptions))
 			{
-				throw new Exception($"Для метода {nameof(VerifyOptionsType)} класса {this.GetType()} необходим " +
+				throw new Exception($"Для класса {this.GetType()} необходим " +
 					$"параметр типа {OptionsType}, а не переданного {options.GetType()}");
 			}
 		}

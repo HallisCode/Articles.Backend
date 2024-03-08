@@ -1,5 +1,4 @@
 using API.Authentication.Middlewares;
-using API.Options;
 using Application.IServices.Authentication;
 using Application.IServices.Registry;
 using Application.IServices.Security;
@@ -92,8 +91,8 @@ namespace WebApi
 
 			// Служебные
 
-			app.UseCors(policy =>
-				policy.AllowAnyOrigin()
+			app.UseCors(policy => policy
+				.AllowAnyOrigin()
 				.AllowAnyHeader()
 				.AllowAnyMethod()
 			);
@@ -106,16 +105,18 @@ namespace WebApi
 
 			app.UseAuthenticationMiddleware();
 
-			app.UseThrottleMiddleware(
-				handlers: new List<Type>()
-				{
+			app.UseThrottleMiddleware(options =>
+			{
+				options.anonymousPolicy = new ThrottleSlidingWindowOptions(96, 16, 64);
+				options.authenticatedPolicy = new ThrottleSlidingWindowOptions(128, 16, 64);
+
+				options.handlers = new List<Type> {
 					typeof(ThrottleWindowHandler),
 					typeof(ThrottleRestingHandler),
-					typeof(ThrottleSlidingWindowHandler),
-				},
-				anonymousPolicy: new ThrottleSlidingWindowOptions(96, 16, 64),
-				authenticatedPolicy: new ThrottleSlidingWindowOptions(128, 16, 64)
-				);
+					typeof(ThrottleSlidingWindowHandler)
+				};
+			});
+
 
 			#endregion
 

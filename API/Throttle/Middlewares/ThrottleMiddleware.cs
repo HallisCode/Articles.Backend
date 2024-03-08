@@ -1,4 +1,5 @@
 ﻿using API.Options;
+using API.Throttle.Options;
 using AspNet.Throttle.Attrubites;
 using AspNet.Throttle.Handlers;
 using AspNet.Throttle.Options;
@@ -36,24 +37,26 @@ namespace AspNet.Throttle.Middlewares
 		public ThrottleMiddleware(
 			RequestDelegate next,
 			IMemoryCache memoryCache,
-			IReadOnlyCollection<Type> handlers,
-			IThrottleOptions anonymousPolicy,
-			IThrottleOptions authenticatedPolicy
-			)
+			ThrottleMiddlewareOptions options
+		)
 		{
 			this.next = next;
 
 			this.memoryCache = memoryCache;
 
 
-			this.handlers = InitializeHandlers(handlers);
+			this.handlers = InitializeHandlers(options.handlers);
 
-			if (this.handlers.Count == 0) throw new Exception($"Не задан ни один throttle handler для {typeof(ThrottleMiddleware)}");
+			if (this.handlers.Count == 0) throw new NullReferenceException("Не задан ни один throttle handler.");
+
+			if (options.anonymousPolicy is null) throw new NullReferenceException("Не задана anonymousPolicy.");
+
+			if (options.authenticatedPolicy is null) throw new NullReferenceException("Не задана authenticatedPolicy.");
 
 
-			this.anonymousPolicy = anonymousPolicy;
+			this.anonymousPolicy = options.anonymousPolicy;
 
-			this.authenticatedPolicy = authenticatedPolicy;
+			this.authenticatedPolicy = options.authenticatedPolicy;
 		}
 
 		/// <summary>
@@ -62,7 +65,7 @@ namespace AspNet.Throttle.Middlewares
 		/// <param name="handlers">Заданные обработчики.</param>
 		/// <returns></returns>
 		/// <exception cref="Exception"></exception>
-		private IReadOnlyCollection<IThrottleHandler> InitializeHandlers(IReadOnlyCollection<Type> handlers)
+		private IReadOnlyCollection<IThrottleHandler> InitializeHandlers(IEnumerable<Type> handlers)
 		{
 			List<IThrottleHandler> _handlers = new List<IThrottleHandler>();
 
@@ -203,12 +206,23 @@ namespace AspNet.Throttle.Middlewares
 	{
 		public static void UseThrottleMiddleware(
 			this IApplicationBuilder app,
-			IReadOnlyCollection<Type> handlers,
-			IThrottleOptions anonymousPolicy,
-			IThrottleOptions authenticatedPolicy
-			)
+			Action<ThrottleMiddlewareOptions> configureOptions
+		)
 		{
-			app.UseMiddleware<ThrottleMiddleware>(handlers, anonymousPolicy, authenticatedPolicy);
+			ThrottleMiddlewareOptions options = new ThrottleMiddlewareOptions();
+
+			configureOptions(options);
+
+			app.UseMiddleware<ThrottleMiddleware>(options);
 		}
+	}
+
+	public class ThrottleMiddlewareOptions
+	{
+		public IThrottleOptions anonymousPolicy { get; set; }
+
+		public IThrottleOptions authenticatedPolicy { get; set; }
+
+		public IEnumerable<Type> handlers { get; set; }
 	}
 }

@@ -47,7 +47,9 @@ namespace AspNet.Throttle.Handlers
 			return false;
 		}
 
-		// Возвращает токены, которые должны были вернуться с истечением времени.
+		/// <summary>
+		/// Возвращает токены, которые должны были вернуться с истечением времени.
+		/// </summary>
 		protected override void ExecuteThrottleRules(string key, ThrottleSlidingWindowOptions options, IContext context)
 		{
 			if (context is not ThrottleSlidingWindowContext)
