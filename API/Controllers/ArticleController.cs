@@ -21,10 +21,10 @@ namespace WebApi.Controllers
 
 		private readonly IMapper mapper;
 
-		private readonly IOptions<DataKeysOptions> dataKeys;
+		private readonly IOptions<HttpContextKeys> dataKeys;
 
 
-		public ArticleController(ArticleService articleService, IOptions<DataKeysOptions> dataKeys, IMapper mapper)
+		public ArticleController(ArticleService articleService, IOptions<HttpContextKeys> dataKeys, IMapper mapper)
 		{
 			this.articleService = articleService;
 

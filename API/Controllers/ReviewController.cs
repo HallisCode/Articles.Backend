@@ -20,9 +20,9 @@ namespace AspNet.Controllers
 
 		private readonly IMapper mapper;
 
-		private readonly IOptions<DataKeysOptions> dataKeys;
+		private readonly IOptions<HttpContextKeys> dataKeys;
 
-		public ReviewController(ReviewService reviewService, IOptions<DataKeysOptions> dataKeys, IMapper mapper)
+		public ReviewController(ReviewService reviewService, IOptions<HttpContextKeys> dataKeys, IMapper mapper)
 		{
 			this.reviewService = reviewService;
 

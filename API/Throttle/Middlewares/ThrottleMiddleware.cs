@@ -1,5 +1,4 @@
 ﻿using API.Options;
-using API.Throttle.Options;
 using AspNet.Throttle.Attrubites;
 using AspNet.Throttle.Handlers;
 using AspNet.Throttle.Options;
@@ -88,7 +87,7 @@ namespace AspNet.Throttle.Middlewares
 			return _handlers.AsReadOnly();
 		}
 
-		public async Task InvokeAsync(HttpContext httpContext, IOptions<DataKeysOptions> dataKeys)
+		public async Task InvokeAsync(HttpContext httpContext, IOptions<HttpContextKeys> dataKeys)
 		{
 			Endpoint? endpoint = httpContext.GetEndpoint();
 
@@ -152,7 +151,7 @@ namespace AspNet.Throttle.Middlewares
 		/// Возвращает идентификатор пользователя сделавшего запрос.
 		/// </summary>
 		/// <returns>Идентификатор пользователя</returns>
-		private string GetIdentifier(HttpContext httpContext, IOptions<DataKeysOptions> dataKeys, out bool isAnonymous)
+		private string GetIdentifier(HttpContext httpContext, IOptions<HttpContextKeys> dataKeys, out bool isAnonymous)
 		{
 			User? user = (User?)httpContext.Items[dataKeys.Value.User];
 

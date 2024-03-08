@@ -22,6 +22,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Application\Application.csproj" />
     <ProjectReference Include="..\Database\Database.csproj" />
+    <ProjectReference Include="..\ScheduledTasks\Scheduler.csproj" />
   </ItemGroup>
 
 </Project>

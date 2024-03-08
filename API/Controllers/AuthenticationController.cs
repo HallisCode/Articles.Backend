@@ -1,5 +1,6 @@
 ﻿using API.Authentication.Attrubites;
 using Application.IServices.Authentication;
+using Application.Options;
 using Application.Services;
 using AspNet.Dto.Request;
 using AspNet.Throttle.Attrubites;
@@ -14,11 +15,11 @@ namespace AspNet.Controllers
 	[Route("api/[controller]/[action]")]
 	public sealed class AuthenticationController : ControllerBase
 	{
-		private readonly IAuthenticationService<string, string> authenticationService;
+		private readonly IAuthenticationService<string, string, AuthOptions> authenticationService;
 
 
 		public AuthenticationController(
-			IAuthenticationService<string, string> authenticationService,
+			IAuthenticationService<string, string, AuthOptions> authenticationService,
 			UserService userService,
 			IMapper mapper
 			)
@@ -33,8 +34,12 @@ namespace AspNet.Controllers
 		{
 			string token = await authenticationService.LogInAsync(
 				logInModel.Email,
-				logInModel.Password
-				);
+				logInModel.Password,
+				new AuthOptions()
+				{
+					AppName = logInModel.AppName
+				}
+			);
 
 			return token;
 		}

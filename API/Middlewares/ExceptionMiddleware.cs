@@ -2,6 +2,7 @@
 using Domain.Exceptions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace AspNet.Middlewares
@@ -13,6 +14,8 @@ namespace AspNet.Middlewares
 		public ExceptionMiddleware(RequestDelegate next)
 		{
 			this.next = next;
+
+			Debug.WriteLine("middleware");
 		}
 
 		public async Task InvokeAsync(HttpContext httpContext)

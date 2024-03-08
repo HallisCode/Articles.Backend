@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Domain.Entities.UserScope
 {
-	public class User
+    public class User
 	{
 		public long Id { get; set; }
 
@@ -17,9 +17,12 @@ namespace Domain.Entities.UserScope
 
 		public string Bio { get; set; }
 
+
 		#region Relationships
 
 		public UserSecurity UserSecurity { get; set; }
+
+		public ICollection<UserSession> Sessions { get; set; }
 
 		public ICollection<Article> Articles { get; set; }
 

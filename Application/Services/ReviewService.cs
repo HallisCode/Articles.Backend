@@ -51,7 +51,7 @@ namespace Application.Services
 
 			if (review is null) throw new NotFoundException("Review with this id isn't found");
 
-			VerifyIsOwnerReview(user, review);
+			VerifyIsReviewOwner(user, review);
 
 
 			return await reviewRepository.UpdateAsync(review, content, type);
@@ -68,7 +68,7 @@ namespace Application.Services
 
 			if (review is null) throw new NotFoundException("Review isn't found");
 
-			VerifyIsOwnerReview(user, review);
+			VerifyIsReviewOwner(user, review);
 
 
 			await reviewRepository.DeleteAsync(id);
@@ -78,7 +78,7 @@ namespace Application.Services
 		/// Верификация того, является ли пользовател автором review
 		/// </summary>
 		/// <exception cref="AccessDeniedException"></exception>
-		private void VerifyIsOwnerReview(User user, Review review)
+		private void VerifyIsReviewOwner(User user, Review review)
 		{
 			if (review.UserId != user.Id)
 			{

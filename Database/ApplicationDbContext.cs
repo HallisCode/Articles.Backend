@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Database
 {
-	public sealed class ApplicationDbContext : DbContext
+    public sealed class ApplicationDbContext : DbContext
 	{
 		public DbSet<Article> Articles { get; set; }
 		public DbSet<Review> Reviews { get; set; }
@@ -14,6 +14,7 @@ namespace Database
 		public DbSet<Tag> Tags { get; set; }
 		public DbSet<User> Users { get; set; }
 		public DbSet<UserSecurity> UserSecurity { get; set; }
+		public DbSet<UserSession> UserSessions { get; set; }
 
 		public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
 		{
@@ -38,6 +39,8 @@ namespace Database
 			modelBuilder.ApplyConfiguration(new TagConfiguration());
 
 			modelBuilder.ApplyConfiguration(new UserConfiguration());
+
+			modelBuilder.ApplyConfiguration(new SessionConfiguration());
 		}
 
 		protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)

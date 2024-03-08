@@ -17,6 +17,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{4691DC3D-C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{1C6B3275-34B8-4E70-95FF-C656A5268FA5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scheduler", "ScheduledTasks\Scheduler.csproj", "{B3A6C86C-50BA-4C0C-B1C1-55A497428B92}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{F1BC31A7-9C5C-4C01-A543-D287BDBF06AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F1BC31A7-9C5C-4C01-A543-D287BDBF06AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F1BC31A7-9C5C-4C01-A543-D287BDBF06AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3A6C86C-50BA-4C0C-B1C1-55A497428B92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3A6C86C-50BA-4C0C-B1C1-55A497428B92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3A6C86C-50BA-4C0C-B1C1-55A497428B92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3A6C86C-50BA-4C0C-B1C1-55A497428B92}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -48,6 +54,7 @@ Global
 		{642D1DC4-BBB7-43A3-AB16-65B0645377F6} = {1C6B3275-34B8-4E70-95FF-C656A5268FA5}
 		{08F6D390-F15E-41EC-B595-50542A86BF46} = {4691DC3D-C82D-4B15-9520-A6950E7DB59B}
 		{F1BC31A7-9C5C-4C01-A543-D287BDBF06AF} = {4691DC3D-C82D-4B15-9520-A6950E7DB59B}
+		{B3A6C86C-50BA-4C0C-B1C1-55A497428B92} = {1C6B3275-34B8-4E70-95FF-C656A5268FA5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {29778889-71B9-4917-BFD2-067F2738098D}

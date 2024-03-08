@@ -1,4 +1,5 @@
 using API.Authentication.Middlewares;
+using Application.Configs;
 using Application.IServices.Authentication;
 using Application.IServices.Registry;
 using Application.IServices.Security;
@@ -17,6 +18,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Quartz;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using System;
 using System.Collections.Generic;
@@ -40,6 +42,10 @@ namespace WebApi
 			builder.Services.AddHttpContextAccessor();
 			builder.Services.AddMemoryCache();
 
+
+			// Добавление планировщика задач
+			builder.Services.AddScheduledTasks();
+
 			// Библиотека EntityFrameworkCore
 			builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectPostresql), ServiceLifetime.Scoped);
 
@@ -60,21 +66,22 @@ namespace WebApi
 			builder.Services.AddScoped<UserRepository>();
 			builder.Services.AddScoped<UserSecurityRepository>();
 			builder.Services.AddScoped<ReviewRepository>();
+			builder.Services.AddScoped<UserSessionRepository>();
 
 			// Logic-Services
 			builder.Services.AddScoped<ArticleService>();
 			builder.Services.AddScoped<ReviewService>();
 			builder.Services.AddScoped<UserService>();
 
-			builder.Services.AddScoped<IAuthenticationService<string, string>, AuthenticationJWTService>();
-			builder.Services.AddScoped<IJWTAuthService<User, string>, AuthenticationJWTService>();
+			builder.Services.AddScoped<IAuthenticationService<string, string, AuthOptions>, AuthenticationSessionService>();
+			builder.Services.AddScoped<IJWTAuthService<User, string>, AuthenticationSessionService>();
 
 			builder.Services.AddScoped<ISecurityService, SecurityService>();
 
 			builder.Services.AddScoped<IRegistryService, RegistryService>();
 
 			// Confugiration
-			builder.Services.Configure<JWTOptions>(builder.Configuration.GetSection(nameof(JWTOptions)));
+			builder.Services.Configure<SessionConfig>(builder.Configuration.GetSection(nameof(SessionConfig)));
 
 			#endregion
 

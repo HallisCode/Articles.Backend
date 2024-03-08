@@ -1,4 +1,5 @@
 ﻿using Application.IServices.Authentication;
+using Application.Options;
 using System.Threading.Tasks;
 
 namespace Application.ServicesBase.Authentication
@@ -8,9 +9,9 @@ namespace Application.ServicesBase.Authentication
 	/// </summary>
 	/// <typeparam name="TToken">Тип данных идентифицирующих пользователя.</typeparam>
 	/// <typeparam name="TRequest">Представление токена, для подтверждения запросов</typeparam>
-	public abstract class AutheticationByEmailServiceBase<TToken, TRequest> : IAuthenticationService<TToken, object>, IConfirmLogIn<TToken, TRequest>
+	public abstract class AutheticationByEmailServiceBase<TToken, TRequest, IOptions> : IAuthenticationService<TToken, object, IOptions>, IConfirmLogIn<TToken, TRequest>
 	{
-		public abstract Task<object> LogInAsync(string email, string password);
+		public abstract Task<object> LogInAsync(string email, string password, IOptions options);
 
 		protected abstract Task SendTokenConfirmLogInAsync(string email);
 

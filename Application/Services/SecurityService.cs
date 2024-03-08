@@ -13,12 +13,14 @@ namespace Application.Services
 	{
 		private readonly UserSecurityRepository userSecurityRepository;
 
-		private readonly TimeSpan lifeSpanToken = new TimeSpan(0, 5, 0);
+		private readonly UserSessionRepository userSessionRepository;
 
 
-		public SecurityService(UserSecurityRepository userSecurityRepository)
+		public SecurityService(UserSecurityRepository userSecurityRepository, UserSessionRepository userSessionRepository)
 		{
 			this.userSecurityRepository = userSecurityRepository;
+
+			this.userSessionRepository = userSessionRepository;
 
 		}
 
@@ -41,6 +43,8 @@ namespace Application.Services
 			if (userSecurity.Password == oldPassword)
 			{
 				await userSecurityRepository.UpdateAsync(userSecurity, null, newPassword);
+
+				await userSessionRepository.DeleteAllAsync(userSecurity.UserId);
 			}
 			else
 			{
@@ -59,6 +63,8 @@ namespace Application.Services
 			UserSecurity userSecurity = (await userSecurityRepository.TryGetByAsync(userId))!;
 
 			await userSecurityRepository.UpdateAsync(userSecurity, newEmail, null);
+
+			await userSessionRepository.DeleteAllAsync(userSecurity.UserId);
 		}
 	}
 }

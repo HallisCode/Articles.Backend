@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using Application.Options;
+using System.Threading.Tasks;
 
 namespace Application.IServices.Authentication
 {
@@ -8,14 +9,14 @@ namespace Application.IServices.Authentication
 	/// <typeparam name="TToken">Тип данных идентифицирующих пользователя. 
 	/// </typeparam>
 	/// <typeparam name="TLoginResult"> В зависимости от реализации интерфейса, при выполнении LogIn, не всегда должны возвращаться данные.
-	/// Должен быть таким же как TToken либо object (void).</typeparam>
-	public interface IAuthenticationService<TToken, TLoginResult>
+	/// </typeparam>
+	public interface IAuthenticationService<TToken, TLoginResult, IOptions>
 	{
 		/// <summary>
 		/// Обрабатывает запрос пользователя на аутентификацию.
 		/// </summary>
 		/// <returns></returns>
-		public Task<TLoginResult> LogInAsync(string email, string password);
+		public Task<TLoginResult> LogInAsync(string email, string password, IOptions options);
 
 		/// <summary>
 		/// Производит выход из сесии.

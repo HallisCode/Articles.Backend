@@ -34,7 +34,12 @@ namespace API.Authentication.Middlewares
 			this.mode = mode;
 		}
 
-		public async Task InvokeAsync(HttpContext httpContext, IOptions<DataKeysOptions> dataKeys, IJWTAuthService<User, string> jWTAuthService)
+		public async Task InvokeAsync(
+			HttpContext httpContext, 
+			IOptions<HeaderKeys> headerKeys, 
+			IOptions<HttpContextKeys> httpContextKeys,
+			IJWTAuthService<User, string> jWTAuthService
+		)
 		{
 			Endpoint? endpoint = httpContext.GetEndpoint();
 
@@ -43,17 +48,17 @@ namespace API.Authentication.Middlewares
 
 			// В случае присутствия в запросе jwt-token - валидируем его
 
-			StringValues possibleJWTToken;
+			StringValues possibleSessionToken;
 
-			bool isHasJWTToken = httpContext.Request.Headers.TryGetValue(dataKeys.Value.JWTToken, out possibleJWTToken);
+			bool isHasSessionToken = httpContext.Request.Headers.TryGetValue(headerKeys.Value.Session, out possibleSessionToken);
 
-			if (isHasJWTToken)
+			if (isHasSessionToken)
 			{
-				string jwtToken = possibleJWTToken[0]!;
+				string jwtToken = possibleSessionToken[0]!;
 
-				user = await jWTAuthService.VerifyJWTTokenAsync(jwtToken);
+				user = await jWTAuthService.VerifySession(jwtToken);
 
-				httpContext.Items[dataKeys.Value.User] = user;
+				httpContext.Items[httpContextKeys.Value.User] = user;
 			}
 
 
@@ -73,7 +78,7 @@ namespace API.Authentication.Middlewares
 			{
 				throw new AccessDeniedException(
 					"Для доступа к ресурсу нужно быть аутентифицированным.",
-					$"Передайте в заголовок запроса параметр {dataKeys.Value.JWTToken}"
+					$"Передайте в заголовок запроса параметр {headerKeys.Value.Session}"
 				);
 			}
 

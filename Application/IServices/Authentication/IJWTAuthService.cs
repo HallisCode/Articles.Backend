@@ -13,6 +13,6 @@ namespace Application.IServices.Authentication
 		/// Проверяет JWT токен на валидность
 		/// </summary>
 		/// <returns>Пользователь jwt токена</returns>
-		public Task<TUser> VerifyJWTTokenAsync(TJwtToken jwtToken);
+		public Task<TUser> VerifySession(TJwtToken jwtToken);
 	}
 }
