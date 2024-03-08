@@ -4,8 +4,7 @@ using Application.IServices.Authentication;
 using Application.IServices.Registry;
 using Application.IServices.Security;
 using Application.Options;
-using Application.Scheduler;
-using Application.Scheduler.Jobs;
+using Application.ScheduledTasks;
 using Application.Services;
 using AspNet.Middlewares;
 using AspNet.Throttle.Handlers;
@@ -49,10 +48,10 @@ namespace WebApi
 			// Добавление планировщика задач
 			builder.Services.AddQuartz(scheduler =>
 			{
-				scheduler.AddJob<SessionCleaner>(config => config.WithIdentity(nameof(SessionCleaner)));
+				scheduler.AddJob<DeleteExpiredSessions>(config => config.WithIdentity(nameof(DeleteExpiredSessions)));
 
 				scheduler.AddTrigger(config =>
-					config.ForJob(nameof(SessionCleaner))
+					config.ForJob(nameof(DeleteExpiredSessions))
 					.WithSimpleSchedule(options => options.WithIntervalInHours(24).RepeatForever())
 				);
 
@@ -87,7 +86,7 @@ namespace WebApi
 			builder.Services.AddScoped<UserService>();
 
 			builder.Services.AddScoped<IAuthenticationService<string, string, AuthOptions>, AuthenticationSessionService>();
-			builder.Services.AddScoped<IJWTAuthService<User, string>, AuthenticationSessionService>();
+			builder.Services.AddScoped<ISessionService<User, string>, AuthenticationSessionService>();
 
 			builder.Services.AddScoped<ISecurityService, SecurityService>();
 

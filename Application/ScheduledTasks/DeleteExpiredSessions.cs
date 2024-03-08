@@ -9,15 +9,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Application.Scheduler.Jobs
+namespace Application.ScheduledTasks
 {
-    public class SessionCleaner : IJob
+    public class DeleteExpiredSessions : IJob
     {
         private readonly ApplicationDbContext context;
 
         private readonly SessionConfig sessionConfig;
 
-        public SessionCleaner(ApplicationDbContext context, IOptions<SessionConfig> sessionConfig)
+        public DeleteExpiredSessions(ApplicationDbContext context, IOptions<SessionConfig> sessionConfig)
         {
             this.context = context;
 
@@ -35,5 +35,5 @@ namespace Application.Scheduler.Jobs
             await context.SaveChangesAsync();
 
         }
-	}
+    }
 }

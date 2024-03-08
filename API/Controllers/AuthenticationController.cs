@@ -18,14 +18,9 @@ namespace AspNet.Controllers
 		private readonly IAuthenticationService<string, string, AuthOptions> authenticationService;
 
 
-		public AuthenticationController(
-			IAuthenticationService<string, string, AuthOptions> authenticationService,
-			UserService userService,
-			IMapper mapper
-			)
+		public AuthenticationController(IAuthenticationService<string, string, AuthOptions> authenticationService)
 		{
 			this.authenticationService = authenticationService;
-
 		}
 
 		[AllowAnonymous]

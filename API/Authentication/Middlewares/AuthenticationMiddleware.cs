@@ -38,7 +38,7 @@ namespace API.Authentication.Middlewares
 			HttpContext httpContext, 
 			IOptions<HeaderKeys> headerKeys, 
 			IOptions<HttpContextKeys> httpContextKeys,
-			IJWTAuthService<User, string> jWTAuthService
+			ISessionService<User, string> sessionService
 		)
 		{
 			Endpoint? endpoint = httpContext.GetEndpoint();
@@ -54,9 +54,9 @@ namespace API.Authentication.Middlewares
 
 			if (isHasSessionToken)
 			{
-				string jwtToken = possibleSessionToken[0]!;
+				string token = possibleSessionToken[0]!;
 
-				user = await jWTAuthService.VerifySession(jwtToken);
+				user = await sessionService.VerifySession(token);
 
 				httpContext.Items[httpContextKeys.Value.User] = user;
 			}

@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Application.Services
 {
-	public sealed class AuthenticationSessionService : AuthentucationSessionServiceBase, IJWTAuthService<User, string>
+	public sealed class AuthenticationSessionService : AuthentucationSessionServiceBase, ISessionService<User, string>
 	{
 		private readonly UserSecurityRepository userSecurityRepository;
 
