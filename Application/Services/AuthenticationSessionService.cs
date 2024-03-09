@@ -7,18 +7,19 @@ using Database.Repositories;
 using Domain.Entities.UserScope;
 using Domain.Exceptions.Authentication;
 using Microsoft.Extensions.Options;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace Application.Services
 {
-	public sealed class AuthenticationSessionService : AuthentucationSessionServiceBase, ISessionService<User, string>
+	public sealed class AuthenticationSessionService : AuthentucationSessionServiceBase
 	{
 		private readonly UserSecurityRepository userSecurityRepository;
 
 		private readonly UserRepository userRepository;
 
-		private readonly UserSessionRepository userSessionRepository;
+		private readonly UserSessionRepository sessionRepository;
 
 
 		public AuthenticationSessionService(
@@ -31,7 +32,7 @@ namespace Application.Services
 
 			this.userRepository = userRepository;
 
-			this.userSessionRepository = userSessionRepository;
+			this.sessionRepository = userSessionRepository;
 
 		}
 
@@ -61,11 +62,20 @@ namespace Application.Services
 			{
 				User user = (await userRepository.TryGetByAsync(userSecurity.UserId))!;
 
-				UserSession? session = await userSessionRepository.TryGetByAsync(user.Id, authOptions.AppName);
+
+				List<UserSession> sessions = await sessionRepository.TryGetAllByAsync(user.Id);
+
+				if (sessions.Count >= 16)
+				{
+					throw new SessionException("Превышено количество допустимых сессий");
+				}
+
+
+				UserSession? session = await sessionRepository.TryGetByAsync(user.Id, authOptions.AppName);
 
 				if (session is null)
 				{
-					session = await userSessionRepository.CreateAsync(user.Id,SessionTokenGenerator.Generate(), authOptions.AppName);
+					session = await sessionRepository.CreateAsync(user.Id,SessionTokenGenerator.Generate(), authOptions.AppName);
 				}
 
 				return session.Token;
@@ -81,26 +91,14 @@ namespace Application.Services
 		/// <returns></returns>
 		public override async Task LogOutAsync(string token)
 		{
-			UserSession? session = await userSessionRepository.TryGetByAsync(token);
+			UserSession? session = await sessionRepository.TryGetByAsync(token);
 
 			if (session is null)
 			{
 				throw new SessionException("Указанная сессия не существует");
 			}
 
-			await userSessionRepository.DeleteAsync(session);
-		}
-
-		public async Task<User> VerifySession(string token)
-		{
-			UserSession? session = await userSessionRepository.TryGetByAsync(token);
-
-			if (session is null)
-			{
-				throw new SessionException("Указанная сессия не существует");
-			}
-
-			return (await userRepository.TryGetByAsync(session.UserId))!;
+			await sessionRepository.DeleteAsync(session);
 		}
 	}
 

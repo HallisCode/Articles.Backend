@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static System.Collections.Specialized.BitVector32;
 
 namespace Database.Repositories
 {
@@ -20,23 +21,31 @@ namespace Database.Repositories
 
 		public async Task<UserSession?> TryGetByAsync(string token)
 		{
-			UserSession? userSession = await context.UserSessions.AsNoTracking()
+			UserSession? session = await context.UserSessions.AsNoTracking()
 				.FirstOrDefaultAsync(session => session.Token == token);
 
-			if (userSession is not null) userSession.LastActivity = DateTime.UtcNow;
+			await UpdateActivity(session);
 
-			return userSession;
+			return session;
 		}
 
 		public async Task<UserSession?> TryGetByAsync(long userId, string appName)
 		{
-			UserSession? userSession = await context.UserSessions.AsNoTracking()
-				.Where(sesion => sesion.UserId == userId)
-				.FirstOrDefaultAsync(sesion => sesion.AppName == appName);
+			UserSession? session = await context.UserSessions.AsNoTracking()
+				.Where(session => session.UserId == userId)
+				.FirstOrDefaultAsync(session => session.AppName == appName);
 
-			if (userSession is not null) userSession.LastActivity = DateTime.UtcNow;
+			await UpdateActivity(session);
 
-			return userSession;
+			return session;
+		}
+
+		public async Task<List<UserSession>> TryGetAllByAsync(long userId)
+		{
+			List<UserSession>? sessions = await context.UserSessions.AsNoTracking()
+				.Where(session => session.UserId == userId).ToListAsync();
+
+			return sessions;
 		}
 
 		#endregion
@@ -45,13 +54,14 @@ namespace Database.Repositories
 
 		public async Task<UserSession> CreateAsync(long userId, string token, string appName)
 		{
-			UserSession? userSession = new UserSession(userId, token, appName);
+			UserSession? session = new UserSession(userId, token, appName);
 
-			context.Add(userSession);
+			context.Add(session);
+
 
 			await context.SaveChangesAsync();
 
-			return userSession;
+			return session;
 		}
 
 		public async Task DeleteAsync(UserSession session)
@@ -63,8 +73,8 @@ namespace Database.Repositories
 
 		public async Task DeleteAllElseAsync(UserSession session)
 		{
-			List<UserSession> sessions = await context.UserSessions.Where(session => session.UserId == session.UserId)
-				.Where(session => session.Id != session.Id)
+			List<UserSession> sessions = await context.UserSessions.Where(_session => _session.UserId == session.UserId)
+				.Where(_session => _session.Id != session.Id)
 				.ToListAsync();
 
 			context.RemoveRange(sessions);
@@ -82,8 +92,17 @@ namespace Database.Repositories
 			await context.SaveChangesAsync();
 		}
 
+
 		#endregion
 
+		private async Task UpdateActivity(UserSession? session)
+		{
+			if (session is not null)
+			{
+				session.LastActivity = DateTime.UtcNow;
 
+				await context.SaveChangesAsync();
+			}
+		}
 	}
 }

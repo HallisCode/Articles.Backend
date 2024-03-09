@@ -84,9 +84,10 @@ namespace WebApi
 			builder.Services.AddScoped<ArticleService>();
 			builder.Services.AddScoped<ReviewService>();
 			builder.Services.AddScoped<UserService>();
+			builder.Services.AddScoped<SessionService>();
 
 			builder.Services.AddScoped<IAuthenticationService<string, string, AuthOptions>, AuthenticationSessionService>();
-			builder.Services.AddScoped<ISessionService<User, string>, AuthenticationSessionService>();
+			builder.Services.AddScoped<ISessionService<User, string>, SessionService>();
 
 			builder.Services.AddScoped<ISecurityService, SecurityService>();
 

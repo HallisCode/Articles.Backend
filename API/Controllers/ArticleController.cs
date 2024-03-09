@@ -21,16 +21,16 @@ namespace WebApi.Controllers
 
 		private readonly IMapper mapper;
 
-		private readonly IOptions<HttpContextKeys> dataKeys;
+		private readonly HttpContextKeys httpContextKeys;
 
 
-		public ArticleController(ArticleService articleService, IOptions<HttpContextKeys> dataKeys, IMapper mapper)
+		public ArticleController(ArticleService articleService, IOptions<HttpContextKeys> httpContextKeys, IMapper mapper)
 		{
 			this.articleService = articleService;
 
 			this.mapper = mapper;
 
-			this.dataKeys = dataKeys;
+			this.httpContextKeys = httpContextKeys.Value;
 		}
 
 		[AllowAnonymous]
@@ -64,7 +64,7 @@ namespace WebApi.Controllers
 		public async Task<ActionResult<ArticleResponse>> CreateAsync([FromBody] ArticleRequest articleRequest)
 		{
 			Article article = await articleService.CreateAsync(
-				user: (User)HttpContext.Items[dataKeys.Value.User]!,
+				user: (User)HttpContext.Items[httpContextKeys.User]!,
 				title: articleRequest.Title,
 				content: articleRequest.Content,
 				tagsId: articleRequest.Tags
@@ -77,7 +77,7 @@ namespace WebApi.Controllers
 		public async Task<ActionResult> UpdateAsync(long id, [FromBody] ArticleRequest articleRequest)
 		{
 			await articleService.UpdateAsync(
-				user: (User)HttpContext.Items[dataKeys.Value.User]!,
+				user: (User)HttpContext.Items[httpContextKeys.User]!,
 				id: id,
 				title: articleRequest.Title,
 				content: articleRequest.Content,
@@ -91,7 +91,7 @@ namespace WebApi.Controllers
 		public async Task<ActionResult> DeleteAsync(long id)
 		{
 			await articleService.DeleteAsync(
-				user: (User)HttpContext.Items[dataKeys.Value.User]!,
+				user: (User)HttpContext.Items[httpContextKeys.User]!,
 				id: id
 				);
 
